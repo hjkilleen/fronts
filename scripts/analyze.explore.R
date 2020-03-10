@@ -19,6 +19,20 @@ str(species)
 
 #EXPLORE
 #=========
+#Power Analysis
+#==========
+power <- data.frame(replicates = c(2, 4, 6, 10, 12, 14),
+          depth_pwr = c(.31, .55, .73, .91, .96, .98),
+          front_pwr = c(.16, .30, .44, .67, .76, .83))
+#Save depth power plot
+jpeg(file = "figures/depth.pwr.jpg")
+plot(power$replicates, power$depth_pwr)
+dev.off()
+#Save front position power plot
+jpeg(file = "figures/front.pwr.jpg")
+plot(power$replicates, power$front_pwr)
+dev.off()
+#=========
 #Boxplots for most common species 
 #=========
 #create common species dataset
