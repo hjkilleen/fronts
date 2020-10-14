@@ -2,6 +2,7 @@
 
 #LIBRARIES
 library(lubridate)
+source("scripts/")
 
 #LOAD DATA
 filenames <- list.files("data/environment/CTD/cleaned/Underway/", full.names = TRUE)
