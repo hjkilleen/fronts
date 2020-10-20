@@ -20,7 +20,7 @@ for(i in seq(1:9)){if(ncol(ldf[[i]]) == 10){
   else {
     names(ldf[[i]]) <- names8
   }}
-#set classes
+#set classes THIS DOESNT WORK
 for(i in seq(1:9)){
   ldf[[4]]$latitude <- as.numeric(as.character(ldf[[4]]$latitude))
   ldf[[4]]$longitude <- as.numeric(as.character(ldf[[4]]$longitude))
