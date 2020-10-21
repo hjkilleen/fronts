@@ -16,6 +16,7 @@ plankton <- read.csv("data/biology/plankton.csv")
 plankton$species_stage <- as.factor(paste(plankton$species, plankton$stage, sep = "_"))
 plankton <- plankton[,-1]
 
+#ATTEMPT 1
 #cast dataframe to site by species format
 plankton.site.sp <- dcast(plankton, location+depth~species_stage, value.var="total", fun.aggregate = mean)
 plankton.site.sp[is.na(plankton.site.sp)] <- 0
@@ -60,3 +61,8 @@ plot(hf.NMDS, cex.lab = 2, cex.axis = 2)
 orditorp(hf.NMDS, display = "sites", col = "red")
 with(hf.env, points(hf.NMDS, display = "sites", col = coldist[station], pch = 19, cex = 2))
 ordiellipse(hf.NMDS, groups = hf.env$station, draw = "polygon", col = coldist)
+
+#ATTEMPT 2 - Only species_stage with >1 observation
+#create vector with only species_stages with >1 observation
+common <- filter(plankton %>% group_by(species_stage) %>% tally(), n>1)[,1]
+common_plankton <- filter(plankton, species_stage %in% common$species_stage)
