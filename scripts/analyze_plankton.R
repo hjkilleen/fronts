@@ -174,10 +174,8 @@ df$position <- factor(df$position, levels = c("onshore_bottom", "onshore_surface
 t <- df %>% group_by(species_stage) %>% tally()
 df <- as.data.frame(left_join(df, t))
 
-df <- df[order(df$n),]
-
 df %>%
-  mutate(species_stage = fct_reorder(species_stage, n, .fun='median' )) %>%
+  mutate(species_stage = fct_reorder(species_stage, n, .fun='median' )) %>%#reorder species_stage by number of observations
 ggplot(aes(x=position, y =species_stage, fill=total_mean))+
   geom_tile()+
   scale_fill_viridis() +
@@ -190,6 +188,57 @@ ggplot(aes(x=position, y =species_stage, fill=total_mean))+
   labs(x='', y ='Species_stage')+
   scale_x_discrete(labels=c("onshore_bottom" = "Onshore Bottom", "onshore_surface" = "Onshore Surface", "front_bottom" = "Front Bottom", "front_surface" = "Front Surface", "offshore_bottom" = "Offshore Bottom", "offshore_surface" = "Offshore Surface")) + 
   ggsave(filename = "figures/heatmapAll.pdf")
+
+#Daily heatmaps
+df <- plankton %>% 
+  group_by_at(.vars = c("species_stage", "position", "date")) %>% 
+  summarize(total = mean(total))
+
+s <- as.data.frame(df) %>% 
+  group_by_at(.vars = c("species_stage", "date")) %>% 
+  summarize(sum = sum(total))#get total mean observation values
+
+df <- left_join(df, s)
+df$total_mean <- df$total/df$sum#total_mean value is a proportion of all observations of each species_stage
+df$position <- factor(df$position, levels = c("onshore_bottom", "onshore_surface", "front_bottom", "front_surface", "offshore_bottom", "offshore_surface"))
+t <- df %>% group_by_at(.vars = c("species_stage", "date")) %>% tally()
+df <- as.data.frame(left_join(df, t))
+d <- levels(plankton$date)
+for(i in seq(1:length(d))){
+  df %>% 
+    filter(date == d[i]) %>% 
+    mutate(species_stage = fct_reorder(species_stage, n, .fun='median' )) %>%#reorder species_stage by number of observations
+    ggplot(aes(x=position, y =species_stage, fill=total_mean))+
+    geom_tile()+
+    scale_fill_viridis() +
+    ggtitle(d[i]) +
+    #theme_sleek() +
+    theme(axis.title.x=element_blank(), 
+          axis.title.y = element_text(color="black", size=10),
+          axis.text.x=element_text(color= "black",size=10), 
+          axis.text.y=element_text(size =10,color= "black")) +
+    theme(legend.position="none")+ #remove legend
+    labs(x='', y ='Species_stage')+
+    scale_x_discrete(labels=c("onshore_bottom" = "Onshore Bottom", "onshore_surface" = "Onshore Surface", "front_bottom" = "Front Bottom", "front_surface" = "Front Surface", "offshore_bottom" = "Offshore Bottom", "offshore_surface" = "Offshore Surface")) + 
+  ggsave(filename = paste(paste("figures/dailyHeatmaps/", i, sep = ""), ".pdf", sep = ""))
+}
+df %>%
+  mutate(species_stage = fct_reorder(species_stage, n, .fun='median' )) %>%#reorder species_stage by number of observations
+  ggplot(aes(x=position, y =species_stage, fill=total_mean))+
+  geom_tile()+
+  scale_fill_viridis() +
+  #theme_sleek() +
+  theme(axis.title.x=element_blank(), 
+        axis.title.y = element_text(color="black", size=10),
+        axis.text.x=element_text(color= "black",size=10), 
+        axis.text.y=element_text(size =10,color= "black")) +
+  theme(legend.position="none")+ #remove legend
+  labs(x='', y ='Species_stage')+
+  scale_x_discrete(labels=c("onshore_bottom" = "Onshore Bottom", "onshore_surface" = "Onshore Surface", "front_bottom" = "Front Bottom", "front_surface" = "Front Surface", "offshore_bottom" = "Offshore Bottom", "offshore_surface" = "Offshore Surface")) + 
+  ggsave(filename = "figures/heatmapAll.pdf")
+
+
+
 #Boxplots
 #=======
 #Diversity
