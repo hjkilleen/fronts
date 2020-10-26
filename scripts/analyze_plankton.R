@@ -113,3 +113,55 @@ orditorp(cp.NMDS,display="species",col="red",air=0.01)
 orditorp(cp.NMDS, display = "sites", col = "black")
 ordiellipse(cp.NMDS, groups = cp.env$location, draw = "polygon", col = colloc[cp.env$location])
 
+
+
+
+#Look at common species plots relative to front
+vcommon <- filter(plankton %>% group_by(species_stage) %>% tally(), n>3)[,1]
+
+for(i in seq(1:length(vcommon$species_stage))){
+  x <- filter(plankton, species_stage == i) %>% 
+    group_by_at(.vars = c("location", "depth")) %>% 
+    summarize(total = mean(total))
+  ggplot()
+}
+
+
+
+#Heatmap
+#========
+vcommon_plankton <- filter(plankton, species_stage %in% vcommon$species_stage)#only plankton with greater than 3 observations
+vcommon_plankton$position <- paste(vcommon_plankton$location, vcommon_plankton$depth, sep = "_")#create position variable 
+df <- vcommon_plankton %>% 
+  group_by_at(.vars = c("species_stage", "position")) %>% 
+  summarize(total = mean(total))
+
+s <- as.data.frame(df) %>% 
+  group_by_at(.vars = "species_stage") %>% 
+  summarize(sum = sum(total))#get total mean observation values
+
+df <- left_join(df, s)
+df$total_mean <- df$total/df$sum#total_mean value is a proportion of all observations of each species_stage
+df$position <- factor(df$position, levels = c("onshore_bottom", "onshore_surface", "front_bottom", "front_surface", "offshore_bottom", "offshore_surface"))
+
+heatmap <- ggplot(df, aes(x=position, y =species_stage, fill=total_mean))+
+  geom_tile()+
+  scale_fill_viridis() +
+  #theme_sleek() +
+  theme(axis.title.x=element_blank(), 
+        axis.title.y = element_text(color="black", size=30, face="bold"),
+        axis.text.x=element_text(color= "black",size=10), 
+        axis.text.y=element_text(size =25,color= "black")) +
+  theme(legend.position="none")+ #remove legend
+  labs(x='', y ='Species_stage')+
+  scale_x_discrete(labels=c("onshore_bottom" = "Onshore Bottom", "onshore_surface" = "Onshore Surface", "front_bottom" = "Front Bottom", "front_surface" = "Front Surface", "offshore_bottom" = "Offshore Bottom", "offshore_surface" = "Offshore Surface"))
+heatmap
+ggsave(filename = "figures/heatmap.pdf", width = 15, height = 7)
+
+#Boxplots
+#=======
+#Diversity
+div <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% tally()#df with number of species_stages per observational unit
+boxplot(n~location, div)
+
+abun <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% summarize(plankters = sum(total))
