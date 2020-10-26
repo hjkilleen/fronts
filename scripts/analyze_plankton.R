@@ -158,6 +158,38 @@ heatmap <- ggplot(df, aes(x=position, y =species_stage, fill=total_mean))+
 heatmap
 ggsave(filename = "figures/heatmap.pdf", width = 15, height = 7)
 
+#try the same analysis for all taxa
+plankton$position <- paste(plankton$location, plankton$depth, sep = "_")#create position variable 
+df <- plankton %>% 
+  group_by_at(.vars = c("species_stage", "position")) %>% 
+  summarize(total = mean(total))
+
+s <- as.data.frame(df) %>% 
+  group_by_at(.vars = "species_stage") %>% 
+  summarize(sum = sum(total))#get total mean observation values
+
+df <- left_join(df, s)
+df$total_mean <- df$total/df$sum#total_mean value is a proportion of all observations of each species_stage
+df$position <- factor(df$position, levels = c("onshore_bottom", "onshore_surface", "front_bottom", "front_surface", "offshore_bottom", "offshore_surface"))
+t <- df %>% group_by(species_stage) %>% tally()
+df <- as.data.frame(left_join(df, t))
+
+df <- df[order(df$n),]
+
+df %>%
+  mutate(species_stage = fct_reorder(species_stage, n, .fun='median' )) %>%
+ggplot(aes(x=position, y =species_stage, fill=total_mean))+
+  geom_tile()+
+  scale_fill_viridis() +
+  #theme_sleek() +
+  theme(axis.title.x=element_blank(), 
+        axis.title.y = element_text(color="black", size=10),
+        axis.text.x=element_text(color= "black",size=10), 
+        axis.text.y=element_text(size =10,color= "black")) +
+  theme(legend.position="none")+ #remove legend
+  labs(x='', y ='Species_stage')+
+  scale_x_discrete(labels=c("onshore_bottom" = "Onshore Bottom", "onshore_surface" = "Onshore Surface", "front_bottom" = "Front Bottom", "front_surface" = "Front Surface", "offshore_bottom" = "Offshore Bottom", "offshore_surface" = "Offshore Surface"))
+heatmapAll
 #Boxplots
 #=======
 #Diversity
@@ -165,3 +197,4 @@ div <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% tall
 boxplot(n~location, div)
 
 abun <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% summarize(plankters = sum(total))
+boxplot(plankters~location, abun)
