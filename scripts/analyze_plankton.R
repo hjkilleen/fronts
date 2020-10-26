@@ -243,7 +243,23 @@ df %>%
 #=======
 #Diversity
 div <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% tally()#df with number of species_stages per observational unit
-boxplot(n~location, div)
+boxplot(n~location, div, main = print(d[i]), xlab = "Location", ylab = "Diversity (n taxa)")
 
 abun <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% summarize(plankters = sum(total))
 boxplot(plankters~location, abun)
+
+#Daily boxplots
+d <- levels(plankton$date)
+for(i in seq(1:length(d))){
+  a <- filter(plankton, date == d[i]) %>% group_by_at(.vars = c("location", "depth")) %>% tally() %>% 
+    ggplot(aes(x = location, y = n, fill = depth)) + 
+    geom_bar(stat = "identity") + 
+    labs(x = "Location", y = "Diversity (n taxa)", title = paste(d[i], "Diversity", sep = " ")) + 
+    theme(legend.position = "none")
+  b <- filter(plankton, date == d[i]) %>% group_by_at(.vars = c("location", "depth")) %>% summarize(plankters = sum(total)) %>% 
+    ggplot(aes(x = location, y = plankters, fill = depth)) + 
+    geom_bar(stat = "identity") + 
+    labs(x = "Location", y = "Abundance (n ind.)", title = paste(d[i], "Abundance", sep = " "))
+  gridExtra::grid.arrange(a, b, ncol = 2)
+  ggsave(filename = paste("figures/dailyBoxplots/", i, ".pdf", sep = ""))
+}
