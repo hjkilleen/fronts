@@ -188,8 +188,8 @@ ggplot(aes(x=position, y =species_stage, fill=total_mean))+
         axis.text.y=element_text(size =10,color= "black")) +
   theme(legend.position="none")+ #remove legend
   labs(x='', y ='Species_stage')+
-  scale_x_discrete(labels=c("onshore_bottom" = "Onshore Bottom", "onshore_surface" = "Onshore Surface", "front_bottom" = "Front Bottom", "front_surface" = "Front Surface", "offshore_bottom" = "Offshore Bottom", "offshore_surface" = "Offshore Surface"))
-heatmapAll
+  scale_x_discrete(labels=c("onshore_bottom" = "Onshore Bottom", "onshore_surface" = "Onshore Surface", "front_bottom" = "Front Bottom", "front_surface" = "Front Surface", "offshore_bottom" = "Offshore Bottom", "offshore_surface" = "Offshore Surface")) + 
+  ggsave(filename = "figures/heatmapAll.pdf")
 #Boxplots
 #=======
 #Diversity
