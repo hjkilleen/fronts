@@ -158,7 +158,7 @@ heatmap <- ggplot(df, aes(x=position, y =species_stage, fill=total_mean))+
   labs(x='', y ='Species_stage')+
   scale_x_discrete(labels=c("onshore_bottom" = "Onshore Bottom", "onshore_surface" = "Onshore Surface", "front_bottom" = "Front Bottom", "front_surface" = "Front Surface", "offshore_bottom" = "Offshore Bottom", "offshore_surface" = "Offshore Surface"))
 heatmap
-ggsave(filename = "figures/heatmap.pdf", width = 15, height = 7)
+ggsave(filename = "figures/heatmap.pdf", width = 15, height = 10)
 
 #try the same analysis for all taxa
 plankton$position <- paste(plankton$location, plankton$depth, sep = "_")#create position variable 
