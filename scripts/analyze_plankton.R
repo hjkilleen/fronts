@@ -12,10 +12,14 @@ library(vegan)
 plankton <- read.csv("data/biology/plankton.csv")
 
 #TIDY DATA
+#harpactacoids>calanoids based on identification QC
+plankton$species[which(plankton$species=="Harpacticoid")] = "Calanoid"
 #create species_stage variable
 plankton$species_stage <- as.factor(paste(plankton$species, plankton$stage, sep = "_"))
 #get rid of neuston
 plankton <- filter(plankton, depth != "neuston") %>% droplevels()
+
+
 #ATTEMPT 1
 #cast dataframe to site by species format
 plankton.site.sp <- dcast(plankton, location+depth+date~species_stage, value.var="total", fun.aggregate = mean)
