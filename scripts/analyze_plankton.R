@@ -13,7 +13,7 @@ plankton <- read.csv("data/biology/plankton.csv", colClasses = c("factor", "fact
 
 #TIDY DATA
 #harpactacoids>calanoids based on identification QC
-plankton$species[which(plankton$species=="Harpacticoid")] = "Calanoid"
+plankton$species[which(plankton$species=="Harpactacoid")] = "Calanoid"
 #create species_stage variable
 plankton$species_stage <- as.factor(paste(plankton$species, plankton$stage, sep = "_"))
 #get rid of neuston
@@ -143,22 +143,26 @@ s <- as.data.frame(df) %>%
   summarize(sum = sum(total))#get total mean observation values
 
 df <- left_join(df, s)
+
 df$total_mean <- df$total/df$sum#total_mean value is a proportion of all observations of each species_stage
 df$position <- factor(df$position, levels = c("onshore_bottom", "onshore_surface", "front_bottom", "front_surface", "offshore_bottom", "offshore_surface"))
+t <- df %>% group_by(species_stage) %>% tally()
+df <- as.data.frame(left_join(df, t))
+df <- df %>% mutate(species_stage = fct_reorder(species_stage, n, .fun='median' ))
 
 heatmap <- ggplot(df, aes(x=position, y =species_stage, fill=total_mean))+
   geom_tile()+
   scale_fill_viridis() +
-  #theme_sleek() +
+  theme_bw() +
   theme(axis.title.x=element_blank(), 
-        axis.title.y = element_text(color="black", size=30, face="bold"),
-        axis.text.x=element_text(color= "black",size=10), 
-        axis.text.y=element_text(size =25,color= "black")) +
+        axis.title.y = element_text(color="black", size=55, face="bold"),
+        axis.text.x=element_text(color= "black",size=25), 
+        axis.text.y=element_text(size =35,color= "black")) +
   theme(legend.position="none")+ #remove legend
   labs(x='', y ='Species_stage')+
   scale_x_discrete(labels=c("onshore_bottom" = "Onshore Bottom", "onshore_surface" = "Onshore Surface", "front_bottom" = "Front Bottom", "front_surface" = "Front Surface", "offshore_bottom" = "Offshore Bottom", "offshore_surface" = "Offshore Surface"))
 heatmap
-ggsave(filename = "figures/heatmap.pdf", width = 15, height = 10)
+ggsave(filename = "figures/heatmap.pdf", width = 25, height = 20)
 
 #try the same analysis for all taxa
 plankton$position <- paste(plankton$location, plankton$depth, sep = "_")#create position variable 
@@ -233,6 +237,9 @@ div <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% tall
 boxplot(n~location, div, xlab = "Location", ylab = "Diversity (n taxa)")
 
 abun <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% summarize(plankters = sum(total))
+boxplot(plankters~location, abun)
+
+abun <- plankton %>% filter(species != "Calanoid") %>% group_by_at(.vars = c("location", "depth", "date")) %>% summarize(plankters = sum(total))
 boxplot(plankters~location, abun)
 
 #Daily boxplots
