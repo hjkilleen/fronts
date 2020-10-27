@@ -9,7 +9,7 @@ library(reshape2)
 library(vegan)
 
 #LOAD DATA
-plankton <- read.csv("data/biology/plankton.csv")
+plankton <- read.csv("data/biology/plankton.csv", colClasses = c("factor", "factor", "factor", "factor", "factor", "integer", "factor", "integer", "integer", "factor"))
 
 #TIDY DATA
 #harpactacoids>calanoids based on identification QC
@@ -70,11 +70,9 @@ ordiellipse(hf.NMDS, groups = hf.env$station, draw = "polygon", col = coldist)
 
 
 #ATTEMPT 2 - Only species_stage with >1 observation
-#create vector with only species_stages with >1 observation
+#create vector with only species_stages with >2 observation
 common <- filter(plankton %>% group_by(species_stage) %>% tally(), n>2)[,1]
 common_plankton <- filter(plankton, species_stage %in% common$species_stage)
-#get rid of neuston samples
-common_plankton <- filter(common_plankton, depth != "neuston") %>% droplevels()
 
 #cast dataframe to site by species format
 common_plankton.site.sp <- dcast(common_plankton, location+depth+date~species_stage, value.var="total", fun.aggregate = mean)
@@ -226,28 +224,13 @@ for(i in seq(1:length(d))){
     scale_x_discrete(labels=c("onshore_bottom" = "Onshore Bottom", "onshore_surface" = "Onshore Surface", "front_bottom" = "Front Bottom", "front_surface" = "Front Surface", "offshore_bottom" = "Offshore Bottom", "offshore_surface" = "Offshore Surface")) + 
   ggsave(filename = paste(paste("figures/dailyHeatmaps/", i, sep = ""), ".pdf", sep = ""))
 }
-df %>%
-  mutate(species_stage = fct_reorder(species_stage, n, .fun='median' )) %>%#reorder species_stage by number of observations
-  ggplot(aes(x=position, y =species_stage, fill=total_mean))+
-  geom_tile()+
-  scale_fill_viridis() +
-  #theme_sleek() +
-  theme(axis.title.x=element_blank(), 
-        axis.title.y = element_text(color="black", size=10),
-        axis.text.x=element_text(color= "black",size=10), 
-        axis.text.y=element_text(size =10,color= "black")) +
-  theme(legend.position="none")+ #remove legend
-  labs(x='', y ='Species_stage')+
-  scale_x_discrete(labels=c("onshore_bottom" = "Onshore Bottom", "onshore_surface" = "Onshore Surface", "front_bottom" = "Front Bottom", "front_surface" = "Front Surface", "offshore_bottom" = "Offshore Bottom", "offshore_surface" = "Offshore Surface")) + 
-  ggsave(filename = "figures/heatmapAll.pdf")
-
 
 
 #Boxplots
 #=======
 #Diversity
 div <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% tally()#df with number of species_stages per observational unit
-boxplot(n~location, div, main = print(d[i]), xlab = "Location", ylab = "Diversity (n taxa)")
+boxplot(n~location, div, xlab = "Location", ylab = "Diversity (n taxa)")
 
 abun <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% summarize(plankters = sum(total))
 boxplot(plankters~location, abun)
