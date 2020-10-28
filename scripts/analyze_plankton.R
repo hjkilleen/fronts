@@ -242,10 +242,14 @@ plankton$depth <- factor(plankton$depth, levels = c("surface", "bottom"))
 
 #Diversity
 div <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% tally()#df with number of species_stages per observational unit
+jpeg(filename = "figures/boxplotDiv.jpeg", width = 500, height = 400)
 boxplot(n~location, div, ylab = "Diversity (n taxa)", xlab = "", main = "Plankton Diversity Across Front", col = "orange")
+dev.off()
 
 abun <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% summarize(plankters = sum(total))
+jpeg(filename = "figures/boxplotAbun.jpeg", width = 500, height = 400)
 boxplot(plankters~location, abun, ylab = "Abundance (n ind.)/5 min.tow", xlab = "", main = "Plankton Abundance Across Front", col = "blue", notch = FALSE)
+dev.off()
 
 abun <- plankton %>% filter(species != "Calanoid") %>% group_by_at(.vars = c("location", "depth", "date")) %>% summarize(plankters = sum(total))
 boxplot(plankters~location, abun)
