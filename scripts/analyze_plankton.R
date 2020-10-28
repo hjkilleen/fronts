@@ -234,26 +234,34 @@ for(i in seq(1:length(d))){
 #=======
 #Diversity
 div <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% tally()#df with number of species_stages per observational unit
-boxplot(n~location, div, xlab = "Location", ylab = "Diversity (n taxa)")
+boxplot(n~location, div, ylab = "Diversity (n taxa)", main = "Plankton Diversity Across Front", col = "orange", notch = FALSE)
 
 abun <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% summarize(plankters = sum(total))
-boxplot(plankters~location, abun)
+boxplot(plankters~location, abun, ylab = "Abundance (n ind.)", main = "Plankton Abundance Across Front", col = "blue", notch = FALSE)
 
 abun <- plankton %>% filter(species != "Calanoid") %>% group_by_at(.vars = c("location", "depth", "date")) %>% summarize(plankters = sum(total))
 boxplot(plankters~location, abun)
 
-#Daily boxplots
+#Daily barplots
 d <- levels(plankton$date)
 for(i in seq(1:length(d))){
   a <- filter(plankton, date == d[i]) %>% group_by_at(.vars = c("location", "depth")) %>% tally() %>% 
     ggplot(aes(x = location, y = n, fill = depth)) + 
     geom_bar(stat = "identity") + 
     labs(x = "Location", y = "Diversity (n taxa)", title = paste(d[i], "Diversity", sep = " ")) + 
+    theme(axis.title.x=element_blank(), 
+          axis.title.y = element_text(color="black", size=15),
+          axis.text.x=element_text(color= "black",size=15), 
+          axis.text.y=element_text(size =15,color= "black")) +
     theme(legend.position = "none")
   b <- filter(plankton, date == d[i]) %>% group_by_at(.vars = c("location", "depth")) %>% summarize(plankters = sum(total)) %>% 
     ggplot(aes(x = location, y = plankters, fill = depth)) + 
     geom_bar(stat = "identity") + 
-    labs(x = "Location", y = "Abundance (n ind.)", title = paste(d[i], "Abundance", sep = " "))
+    labs(x = "Location", y = "Abundance (n ind.)", title = paste(d[i], "Abundance", sep = " ")) +
+  theme(axis.title.x=element_blank(), 
+        axis.title.y = element_text(color="black", size=15),
+        axis.text.x=element_text(color= "black",size=15), 
+        axis.text.y=element_text(size =15,color= "black"))
   gridExtra::grid.arrange(a, b, ncol = 2)
   ggsave(filename = paste("figures/dailyBoxplots/", i, ".pdf", sep = ""))
 }
