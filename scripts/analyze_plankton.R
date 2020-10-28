@@ -150,6 +150,10 @@ t <- df %>% group_by(species_stage) %>% tally()
 df <- as.data.frame(left_join(df, t))
 df <- df %>% mutate(species_stage = fct_reorder(species_stage, n, .fun='median' ))
 
+#add vertical lines to define locations
+my.lines<-data.frame(x=c(2.5,4.5), y=c(0,0), 
+                     xend=c(2.5,4.5), yend=c(22.5,22.5))
+
 heatmap <- ggplot(df, aes(x=position, y =species_stage, fill=total_mean))+
   geom_tile()+
   scale_fill_viridis() +
@@ -160,7 +164,8 @@ heatmap <- ggplot(df, aes(x=position, y =species_stage, fill=total_mean))+
         axis.text.y=element_text(size =35,color= "black")) +
   theme(legend.position="none")+ #remove legend
   labs(x='', y ='Species_stage')+
-  scale_x_discrete(labels=c("onshore_bottom" = "Onshore Bottom", "onshore_surface" = "Onshore Surface", "front_bottom" = "Front Bottom", "front_surface" = "Front Surface", "offshore_bottom" = "Offshore Bottom", "offshore_surface" = "Offshore Surface"))
+  scale_x_discrete(labels=c("onshore_bottom" = "Onshore Bottom", "onshore_surface" = "Onshore Surface", "front_bottom" = "Front Bottom", "front_surface" = "Front Surface", "offshore_bottom" = "Offshore Bottom", "offshore_surface" = "Offshore Surface")) +
+  geom_segment(data=my.lines, aes(x,y,xend=xend, yend=yend), size=3, inherit.aes=F)
 heatmap
 ggsave(filename = "figures/heatmap.pdf", width = 25, height = 20)
 
@@ -232,12 +237,15 @@ for(i in seq(1:length(d))){
 
 #Boxplots
 #=======
+plankton$location <- factor(plankton$location, levels = c("onshore", "front", "offshore"))
+plankton$depth <- factor(plankton$depth, levels = c("surface", "bottom"))
+
 #Diversity
 div <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% tally()#df with number of species_stages per observational unit
-boxplot(n~location, div, ylab = "Diversity (n taxa)", main = "Plankton Diversity Across Front", col = "orange", notch = FALSE)
+boxplot(n~location, div, ylab = "Diversity (n taxa)", xlab = "", main = "Plankton Diversity Across Front", col = "orange")
 
 abun <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% summarize(plankters = sum(total))
-boxplot(plankters~location, abun, ylab = "Abundance (n ind.)", main = "Plankton Abundance Across Front", col = "blue", notch = FALSE)
+boxplot(plankters~location, abun, ylab = "Abundance (n ind.)/5 min.tow", xlab = "", main = "Plankton Abundance Across Front", col = "blue", notch = FALSE)
 
 abun <- plankton %>% filter(species != "Calanoid") %>% group_by_at(.vars = c("location", "depth", "date")) %>% summarize(plankters = sum(total))
 boxplot(plankters~location, abun)
@@ -262,6 +270,6 @@ for(i in seq(1:length(d))){
         axis.title.y = element_text(color="black", size=15),
         axis.text.x=element_text(color= "black",size=15), 
         axis.text.y=element_text(size =15,color= "black"))
-  gridExtra::grid.arrange(a, b, ncol = 2)
-  ggsave(filename = paste("figures/dailyBoxplots/", i, ".pdf", sep = ""))
+  x <- gridExtra::grid.arrange(a, b, ncol = 2)
+  ggsave(x, filename = paste("figures/dailyBoxplots/", i, ".pdf", sep = ""), width = 10, height = 7)
 }
