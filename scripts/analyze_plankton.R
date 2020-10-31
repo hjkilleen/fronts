@@ -132,6 +132,7 @@ for(i in seq(1:length(vcommon$species_stage))){
 
 #Heatmap
 #========
+vcommon <- filter(plankton %>% group_by(species_stage) %>% tally(), n>3)[,1]
 vcommon_plankton <- filter(plankton, species_stage %in% vcommon$species_stage)#only plankton with greater than 3 observations
 vcommon_plankton$position <- paste(vcommon_plankton$location, vcommon_plankton$depth, sep = "_")#create position variable 
 df <- vcommon_plankton %>% 
@@ -159,15 +160,15 @@ heatmap <- ggplot(df, aes(x=position, y =species_stage, fill=total_mean))+
   scale_fill_viridis() +
   theme_bw() +
   theme(axis.title.x=element_blank(), 
-        axis.title.y = element_text(color="black", size=55, face="bold"),
-        axis.text.x=element_text(color= "black",size=25), 
-        axis.text.y=element_text(size =35,color= "black")) +
+        axis.title.y = element_text(color="black", size=110, face="bold"),
+        axis.text.x=element_text(color= "black",size=56), 
+        axis.text.y=element_text(size =70,color= "black")) +
   theme(legend.position="none")+ #remove legend
   labs(x='', y ='Species_stage')+
-  scale_x_discrete(labels=c("onshore_bottom" = "Onshore Bottom", "onshore_surface" = "Onshore Surface", "front_bottom" = "Front Bottom", "front_surface" = "Front Surface", "offshore_bottom" = "Offshore Bottom", "offshore_surface" = "Offshore Surface")) +
+  scale_x_discrete(labels=c("onshore_bottom" = "Onshore\nBottom", "onshore_surface" = "Onshore\nSurface", "front_bottom" = "Front\nBottom", "front_surface" = "Front\nSurface", "offshore_bottom" = "Offshore\nBottom", "offshore_surface" = "Offshore\nSurface")) +
   geom_segment(data=my.lines, aes(x,y,xend=xend, yend=yend), size=3, inherit.aes=F)
 heatmap
-ggsave(filename = "figures/heatmap.pdf", width = 25, height = 20)
+ggsave(filename = "figures/heatmap.jpg", width = 38, height = 30)
 
 #try the same analysis for all taxa
 plankton$position <- paste(plankton$location, plankton$depth, sep = "_")#create position variable 
@@ -242,21 +243,23 @@ plankton$depth <- factor(plankton$depth, levels = c("surface", "bottom"))
 
 #Diversity
 div <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% tally()#df with number of species_stages per observational unit
-jpeg(filename = "figures/boxplotDiv.jpeg", width = 1000, height = 800)
-par(cex.lab = 3)
-par(cex.axis = 1.5)
-par(cex.main = 2)
-par(mar=c(4,7,5,2))
+jpeg(filename = "figures/boxplotDiv.jpeg", width = 800, height = 500)
+par(cex.lab = 4)
+par(cex.axis = 2.8)
+par(cex.main = 3.5)
+par(mar=c(3,8,4,3))
+par(mgp = c(5,2,0))
 boxplot(n~location, div, ylab = "Diversity (n taxa)", xlab = "", main = "Plankton Diversity Across Front", col = "orange")
 dev.off()
 
 abun <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% summarize(plankters = sum(total))
-jpeg(filename = "figures/boxplotAbun.jpeg", width = 1000, height = 800)
+jpeg(filename = "figures/boxplotAbun.jpeg", width = 800, height = 500)
 par(cex.lab = 3)
-par(cex.axis = 1.5)
-par(cex.main = 2)
-par(mar=c(4,7,5,2))
-boxplot(plankters~location, abun, ylab = "Abundance (n ind.)/5 min.tow", xlab = "", main = "Plankton Abundance Across Front", col = "blue", notch = FALSE)
+par(cex.axis = 2.8)
+par(cex.main = 3.5)
+par(mar=c(4,10.5,4,3.5))
+par(mgp = c(5,2,0))
+boxplot(plankters~location, abun, ylab = "Abundance\n(n ind.)/5 min.tow", xlab = "", main = "Plankton Abundance Across Front", col = "blue", notch = FALSE)
 dev.off()
 
 abun <- plankton %>% filter(species != "Calanoid") %>% group_by_at(.vars = c("location", "depth", "date")) %>% summarize(plankters = sum(total))
@@ -270,18 +273,23 @@ for(i in seq(1:length(d))){
     geom_bar(stat = "identity") + 
     labs(x = "Location", y = "Diversity (n taxa)", title = paste(d[i], "Diversity", sep = " ")) + 
     theme(axis.title.x=element_blank(), 
-          axis.title.y = element_text(color="black", size=15),
-          axis.text.x=element_text(color= "black",size=15), 
-          axis.text.y=element_text(size =15,color= "black")) +
+          axis.title.y = element_text(color="black", size=30),
+          axis.text.x=element_text(color= "black",size=25), 
+          axis.text.y=element_text(size =20,color= "black"),
+          plot.title = element_text(color = "black", size = 33, face = "bold"))+
     theme(legend.position = "none")
   b <- filter(plankton, date == d[i]) %>% group_by_at(.vars = c("location", "depth")) %>% summarize(plankters = sum(total)) %>% 
     ggplot(aes(x = location, y = plankters, fill = depth)) + 
     geom_bar(stat = "identity") + 
     labs(x = "Location", y = "Abundance (n ind.)", title = paste(d[i], "Abundance", sep = " ")) +
   theme(axis.title.x=element_blank(), 
-        axis.title.y = element_text(color="black", size=15),
-        axis.text.x=element_text(color= "black",size=15), 
-        axis.text.y=element_text(size =15,color= "black"))
+        axis.title.y = element_text(color="black", size=30),
+        axis.text.x=element_text(color= "black",size=25), 
+        axis.text.y=element_text(size =20,color= "black"),
+        plot.title = element_text(color = "black", size = 33, face = "bold")) +
+  theme(legend.title = element_text(color = "black", size = 18),
+        legend.text = element_text(color = "black", size = 15))+
+    theme(legend.position = "none")
   x <- gridExtra::grid.arrange(a, b, ncol = 2)
-  ggsave(x, filename = paste("figures/dailyBoxplots/", i, ".pdf", sep = ""), width = 10, height = 7)
+  ggsave(x, filename = paste("figures/dailyBoxplots/", i, ".pdf", sep = ""), width = 14, height = 9)
 }
