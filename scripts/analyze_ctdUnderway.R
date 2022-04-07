@@ -7,7 +7,7 @@ library(dplyr)
 source("scripts/functions/environmental.utils.R")
   
 #LOAD DATA
-filenames <- list.files("data/environment/CTD/cleaned/Underway/", full.names = TRUE)
+filenames <- list.files("data/environment/underway/", full.names = TRUE)
 ldf <- lapply(filenames, read.table)
 
 #RESTRUCTURE/CLEAN DATA
