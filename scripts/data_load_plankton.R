@@ -10,7 +10,6 @@ library(readxl)
 
 #LOAD DATA
 #====
-#load cruise 3
 sheet <- excel_sheets("data/biology/counts/07182019.xlsx")
 cruise1 <- lapply(setNames(sheet, sheet), 
                   function(x) read_excel("data/biology/counts/07182019.xlsx", sheet=x))
@@ -40,6 +39,18 @@ cruise6 <- lapply(setNames(sheet, sheet),
                   function(x) read_excel("data/biology/counts/06302020.xlsx", sheet=x))
 cruise6 <- bind_rows(cruise6, .id="Sheet")
 save(cruise6, file = "data/biology/counts/cruise6.rda")
+
+sheet <- excel_sheets("data/biology/counts/09302020.xlsx")
+cruise9 <- lapply(setNames(sheet, sheet), 
+                  function(x) read_excel("data/biology/counts/09302020.xlsx", sheet=x))
+cruise9 <- bind_rows(cruise9, .id="Sheet")
+save(cruise9, file = "data/biology/counts/cruise9.rda")
+
+sheet <- excel_sheets("data/biology/counts/10062020.xlsx")
+cruise10 <- lapply(setNames(sheet, sheet), 
+                  function(x) read_excel("data/biology/counts/10062020.xlsx", sheet=x))
+cruise10 <- bind_rows(cruise10, .id="Sheet")
+save(cruise10, file = "data/biology/counts/cruise10.rda")
 
 #Bind all cruises
 plankton <- bind_rows(cruise1, cruise3, cruise4, cruise5, cruise6)
