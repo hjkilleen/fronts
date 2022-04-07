@@ -53,7 +53,7 @@ cruise10 <- bind_rows(cruise10, .id="Sheet")
 save(cruise10, file = "data/biology/counts/cruise10.rda")
 
 #Bind all cruises
-plankton <- bind_rows(cruise1, cruise3, cruise4, cruise5, cruise6)
+plankton <- bind_rows(cruise1, cruise3, cruise4, cruise5, cruise6, cruise9, cruise10)
 save(plankton, file = "data/biology/counts/plankton.rda")
 #====
 
