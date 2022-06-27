@@ -8,7 +8,9 @@ library(viridis)
 library(reshape2)
 library(vegan)
 library(lubridate)
+library(broom)
 load("data/biology/counts/plankton.rda")
+load("data/metadata.rda")
 
 #TOTAL ABUNDANCE
 #====
@@ -34,6 +36,30 @@ ggplot(div) +
   geom_boxplot(aes(location, n)) + 
   labs(x = "Location", y = "Count/5 min tow") + 
   theme(text = element_text(size = 15), axis.text = element_text(size = 15))
+#====
+
+#SHANNON-WEINER INDEX
+#====
+#Set Up
+p <- select(plankton, location, date, depth, sample, spStage, count)
+p <- filter(p, depth != "neuston", date != as.POSIXct("2019-07-18"))#remove neuston and cruise 1
+p.site.sp <- dcast(p, sample~spStage, value.var="count", fun.aggregate = mean)
+p.site.sp[is.na(p.site.sp)] <- 0
+tows <- select(us, sample, date, site, location, depth)
+tows <- distinct(tows)
+
+#Calculate Shannon-Weiner Index
+p.site.sp$diversity <- diversity(p.site.sp[,-1], index = "shannon")#calculate Shannon-Weiner diversity of each tow
+
+#Attach to metadata
+p.site.sp <- left_join(select(p.site.sp, sample, diversity), tows)
+
+#Plot
+boxplot(diversity~location, data = p.site.sp)
+
+#ANOVA
+anova.loc.div <- aov(diversity~location, data = p.site.sp)
+summary(anova.loc.div)
 #====
 
 
