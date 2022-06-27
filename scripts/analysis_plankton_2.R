@@ -8,23 +8,22 @@ library(viridis)
 library(reshape2)
 library(vegan)
 library(lubridate)
+load("data/biology/counts/plankton.rda")
 
 #TOTAL ABUNDANCE
 #====
-plankton <- mutate(plankton, name_stage = paste(species, stage, sep = "."))#create species name with stage modifier
 plankton <- filter(plankton, !is.na(location), depth != "neuston")
 plankton$location <- factor(plankton$location, levels = c("onshore", "front", "offshore"))#set depth bin order
-x <- tally(group_by(plankton, name_stage))
+plankton$depth <- factor(plankton$depth, levels = c("surface", "bottom"))
+x <- tally(group_by(plankton, species))
 plankton <- left_join(plankton, x)
-plankton <- filter(plankton, n>1)#get rid of species/stages that were only observed once
+us <- filter(plankton, n>10)
 
-y <- summarize(group_by(plankton, name_stage), n = mean(n))#frequency of occurence
-us <- filter(y, n>9)#create list of the usual suspects, i.e. occur in ~50% of samples
 
 #Boxplot of bulk abundance
-ggplot(summarize(group_by_at(plankton, vars(date, location, depth)), total = mean(total))) + 
-  geom_boxplot(aes(location, total)) + 
-  ylim(0, 15000) + 
+plankton <- left_join(plankton, summarize(group_by(plankton, sample, tot_per_tow = sum(total))))
+ggplot(plankton) + 
+  geom_boxplot(aes(location, tot_per_tow)) + 
   labs(x = "Location", y = "Count/5 min tow") + 
   theme(text = element_text(size = 15), axis.text = element_text(size = 15))
 
@@ -43,15 +42,15 @@ ggplot(div) +
 #ALL SPECIES - species and stage
 
 #select grouping metadata
-p <- select(plankton, location, depth, sample, name_stage, count)
+p <- select(us, location, date, depth, sample, spStage, count)
+p <- filter(p, depth != "neuston", date != as.POSIXct("2019-07-18"))#remove neuston
 #cast dataframe to site by species format
-p[, 1:4] <- lapply(p[, 1:4], as.factor)
-p.site.sp <- dcast(p, location+depth~name_stage, value.var="count", fun.aggregate = mean)
+p.site.sp <- dcast(p, date+location+depth~spStage, value.var="count", fun.aggregate = mean)
 p.site.sp[is.na(p.site.sp)] <- 0
 
 #Create dissimilarity matrix
 #change second value if you have added more species
-p.comm <- p.site.sp[,3:88]
+p.comm <- p.site.sp[,4:53]
 p.env <- p.site.sp[,1:2]
 p.dist <- vegdist(p.comm)
 attach(p.env)
@@ -68,27 +67,27 @@ plot(p.ano.st)
 
 #NMDS
 coldep <- c("red", "blue")
-coldist <- c("bisque3", "green", "darkblue")
+coldist <- c("green", "darkblue", "bisque")
 p.NMDS <- metaMDS(p.dist, k=2)
 plot(p.NMDS)
-sppscores(p.NMDS) <- p.comm
 with(p.env, points(p.NMDS, display = "sites", col = coldist[location], pch = 19, cex = 2))
-orditorp(p.NMDS,display="species",col="red",air=0.01)
+ordiellipse(p.NMDS, groups = p.env$location, draw = "polygon", col = coldist)
+orditorp(p.NMDS,display="sites",col="red",air=0.01)
 
 #====
 
 #TAXONOMIC SPECIFIC PLOTS
 #====
-z <- unique(us$name_stage)
-results <- "figures/exploratoryPlots/usualSuspects/"
-plankton$date <- as.factor(plankton$date)
-
-for (i in z) {#create plots for each species/stage
-  filter(plankton, name_stage==i) %>% 
+z <- unique(us$date)
+results <- "figures/exploratoryPlots/taxaBySurvey/"
+plankton$spStage <- as.factor(plankton$spStage)
+i<-8
+for (i in 1:length(z)) {#create plots for each species/stage
+  filter(plankton, date==z[i]) %>% 
     ggplot(aes(x = location, y = total, fill = depth))+
     geom_col(position = "stack")+
-    facet_wrap(~date)+
-    ggtitle(print(i))+
+    facet_wrap(~spStage, scales = "free")+
+    ggtitle(print(z[i]))+
     labs(x = "Location", y = "Count/5 min tow")+
     theme(text = element_text(size = 10), axis.text = element_text(size = 10))
   ggsave(paste(results,i,".jpg", sep = ""))
@@ -96,10 +95,10 @@ for (i in z) {#create plots for each species/stage
 
 
 #Weirdos
-x <- summarize(group_by_at(plankton, vars(name_stage, date)), daily_total_spp_stg = sum(total))
+x <- summarize(group_by_at(plankton, vars(spStage, date)), daily_total_spp_stg = sum(total))
 plankton <- left_join(plankton, x)
 plankton$rel_abund <- plankton$total/plankton$daily_total_spp_stg
-weirdos <- summarize(group_by_at(filter(plankton, n<10), vars(location, depth, name_stage)), relAbun_mean = mean(rel_abund))
+weirdos <- summarize(group_by_at(filter(plankton, n<10), vars(location, depth, spStage)), relAbun_mean = mean(rel_abund))
 weirdos$loc.dep <- paste(weirdos$location, weirdos$depth, sep = ".")
 
 ggplot(summarize(group_by_at(filter(plankton, n<10), vars(date, location, depth)), total = mean(total))) + 
@@ -110,7 +109,7 @@ ggplot(summarize(group_by_at(filter(plankton, n<10), vars(date, location, depth)
 #Barnacles
 barnacles <- c("b.crenatus.naup2.3", "b.glandula.naup2.3", "chth.naup2.3", "p.polymerus.naup2.3")
 for (i in barnacles) {#create plots for each species/stage
-  filter(plankton, name_stage==i) %>% 
+  filter(plankton, spStage==i) %>% 
     ggplot(aes(x = location, y = total, fill = depth))+
     geom_col(position = "stack")+
     ggtitle(print(i))+
@@ -126,7 +125,7 @@ plankton$loc.dep <- paste(plankton$location, plankton$depth, sep = ".")
 my.lines<-data.frame(x=c(2.5,4.5), y=c(0,0), 
                      xend=c(2.5,4.5), yend=c(19,19))
 
-heatmap <- ggplot(filter(plankton, name_stage %in% us$name_stage), aes(x=loc.dep, y =name_stage, fill=rel_abund))+
+heatmap <- ggplot(filter(plankton, spStage %in% us$spStage), aes(x=loc.dep, y =spStage, fill=rel_abund))+
   geom_tile()+
   scale_fill_viridis() +
   theme_bw() +
