@@ -11,10 +11,14 @@ load("data/biology/counts/plankton.rda")
 
 #SET UP
 #====
-#eliminate unused 'sheet' column
-plankton <- plankton[,2:10]
 #create combined species_stage moniker
 plankton$spStage <- paste(plankton$species, plankton$stage, sep = "_")
+#====
+
+#CLEAN UP COLUMNS
+#====
+plankton$date <- as.POSIXct(plankton$date)
+plankton[,c(2:5, 7:8, 10)] <- lapply(plankton[,c(2:5, 7:8, 10)], factor)
 #====
 
 #DERIVED VARIABLES
@@ -22,10 +26,13 @@ plankton$spStage <- paste(plankton$species, plankton$stage, sep = "_")
 #create a new variable for count * split (count/five min. tow)
 plankton$total <- plankton$count*plankton$split
 #create observational tally to estimate frequency of species_stage in dataset
-tally <- tally(group_by(plankton, spStage))
+#tally <- tally(group_by(plankton, spStage))
 #====
 
-
+#SAVE
+#====
+save(plankton, file = "data/biology/counts/plankton.rda")
+#====
 
 
 
