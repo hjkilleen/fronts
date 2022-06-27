@@ -5,6 +5,9 @@ library(lubridate)
 library(ggplot2)
 library(dplyr)
 source("scripts/functions/environmental.utils.R")
+load("data/metadata.rda")
+load(file = "data/environment/mapping/flah_map_data.R")
+load("data/cruiseDates.rda")
   
 #LOAD DATA
 filenames <- list.files("data/environment/underway/", full.names = TRUE)
@@ -20,11 +23,11 @@ for(i in seq(1:9)){if(ncol(ldf[[i]]) == 10){
   else {
     names(ldf[[i]]) <- names8
   }}
-#set classes THIS DOESNT WORK
-for(i in seq(1:9)){
-  ldf[[4]]$latitude <- as.numeric(as.character(ldf[[4]]$latitude))
-  ldf[[4]]$longitude <- as.numeric(as.character(ldf[[4]]$longitude))
-  ldf[[4]]$density <- as.numeric(as.character(ldf[[4]]$density))
+#set classes
+for(i in c(1,2,4:9)){
+  ldf[[i]]$latitude <- as.numeric(as.character(ldf[[i]]$latitude))
+  ldf[[i]]$longitude <- as.numeric(as.character(ldf[[i]]$longitude))
+  ldf[[i]]$density <- as.numeric(as.character(ldf[[i]]$density))
 }
 #add PDT time
 for(i in seq(1:9)){
@@ -46,31 +49,64 @@ for(i in seq(1:9)){
 #PLOTS
 #this doesn't work
 #lapply(ldf, map.underway)
-load(file = "data/environment/mapping/flah_map_data.R")
 
 ggplot(filter(ldf[[1]], density>1024.8, density <1025.6))+
-  geom_point(size = 3, shape = 21, color = "grey", aes(x = longitude, y = latitude, fill = density))+
+  geom_point(size = 3, shape = 21, color = "transparent", aes(x = longitude, y = latitude, fill = density))+
   scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = mean(ldf[[1]]$density)) +
   geom_point(data = coastline.df %>% dplyr::filter(long < max(ldf[[1]]$longitude) + 0.0075, long > min(ldf[[1]]$longitude), lat > min(ldf[[1]]$latitude) - 0.25, lat < max(ldf[[1]]$latitude)), aes(x = long, y = lat), size = 0.1) +
   labs(x = "Longitude", y = "Latitude", title = paste(ldf[[1]]$date[1], "Surface Density", sep = " ")) +
-  geom_segment(data = data.frame( y = 38.32622, x = -123.07793, yend = 38.32713, xend = -123.0846),
-               aes(x = x, y = y, xend = xend, yend = yend), color = "black", size = 1, inherit.aes = FALSE) + 
-  geom_segment(data = data.frame( y = 38.32466, x = -123.0817, yend = 38.3261, xend = -123.08662),
-               aes(x = x, y = y, xend = xend, yend = yend), color = "black", size = 1, inherit.aes = FALSE) +
-  geom_segment(data = data.frame( y = 38.32374, x = -123.08311, yend = 38.32505, xend = -123.08913),
-               aes(x = x, y = y, xend = xend, yend = yend), color = "black", size = 1, inherit.aes = FALSE) +
+  geom_segment(data = filter(md, date == cruiseDates[2], observation =="mt"), aes(y = start_lat, x = start_lon, yend = end_lat, xend = end_lon), color = "black", size = 1, inherit.aes = FALSE) +
+  theme_classic()
   ggsave(file = "figures/ctdUnderway/8.15.2019.jpg")
 
 ggplot(filter(ldf[[4]], density>1024.7))+
-  geom_point(size = 3, shape = 21, color = "grey", aes(x = longitude, y = latitude, fill = density))+
+  geom_point(size = 3, shape = 21, color = "transparent", aes(x = longitude, y = latitude, fill = density))+
   scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = mean(ldf[[4]]$density)) +
   geom_point(data = coastline.df %>% dplyr::filter(long < max(ldf[[4]]$longitude) + 0.0075, long > min(ldf[[4]]$longitude), lat > min(ldf[[4]]$latitude) - 0.25, lat < max(ldf[[4]]$latitude)), aes(x = long, y = lat), size = 0.1) +
   labs(x = "Longitude", y = "Latitude", title = paste(ldf[[4]]$date[1], "Surface Density", sep = " ")) +
-  geom_segment(data = data.frame( y = 38.32622, x = -123.07793, yend = 38.32713, xend = -123.0846),
-               aes(x = x, y = y, xend = xend, yend = yend), color = "black", size = 1, inherit.aes = FALSE) + 
-  geom_segment(data = data.frame( y = 38.32466, x = -123.0817, yend = 38.3261, xend = -123.08662),
-               aes(x = x, y = y, xend = xend, yend = yend), color = "black", size = 1, inherit.aes = FALSE) +
-  geom_segment(data = data.frame( y = 38.32374, x = -123.08311, yend = 38.32505, xend = -123.08913),
-               aes(x = x, y = y, xend = xend, yend = yend), color = "black", size = 1, inherit.aes = FALSE) +
-  geom_point(data = data.frame(lon = c(-123.08422, -123.08327, -123.08344, -123.08489, -123.08164), lat = c(38.32222, 38.32371, 38.32461, 38.32648, 38.33100)), aes(x = lon, y = lat), color = "black", shape = 4, size = 5) +
+  geom_segment(data = filter(md, date == cruiseDates[5], observation =="mt"), aes(y = start_lat, x = start_lon, yend = end_lat, xend = end_lon), color = "black", size = 1, inherit.aes = FALSE) +
+  geom_point(data = filter(md, date == cruiseDates[5], observation =="ctd_profile"), aes(y = start_lat, x = start_lon), color = "black", shape = 4, size = 5) +
+  theme_classic()
   ggsave(file = "figures/ctdUnderway/6.30.2020.jpg")
+  
+  ggplot(filter(ldf[[5]], density > 1023))+
+    geom_point(size = 3, shape = 21, color = "transparent", aes(x = longitude, y = latitude, fill = density))+
+    scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = mean(ldf[[5]]$density)) +
+    geom_point(data = coastline.df %>% dplyr::filter(long < max(ldf[[5]]$longitude) + 0.0075, long > min(ldf[[5]]$longitude), lat > min(ldf[[5]]$latitude) - 0.25, lat < max(ldf[[5]]$latitude)), aes(x = long, y = lat), size = 0.1) +
+    labs(x = "Longitude", y = "Latitude", title = paste(ldf[[5]]$date[1], "Surface Density", sep = " ")) +
+    geom_segment(data = filter(md, date == as.POSIXct("2020-07-28"), observation =="mt"), aes(y = start_lat, x = start_lon, yend = end_lat, xend = end_lon), color = "black", size = 1, inherit.aes = FALSE) +
+    geom_point(data = filter(md, date == as.POSIXct("2020-07-28"), observation =="ctd_profile"), aes(y = start_lat, x = start_lon), color = "black", shape = 4, size = 5) +
+    theme_classic()
+  ggsave(file = "figures/ctdUnderway/7.28.2020.jpg")
+  
+  ggplot(filter(ldf[[6]], density > 1024.5))+
+    geom_point(size = 3, shape = 21, color = "transparent", aes(x = longitude, y = latitude, fill = density))+
+    scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = mean(ldf[[6]]$density)) +
+    geom_point(data = coastline.df %>% dplyr::filter(long < max(ldf[[6]]$longitude) + 0.0075, long > min(ldf[[6]]$longitude), lat > min(ldf[[6]]$latitude) - 0.25, lat < max(ldf[[6]]$latitude)), aes(x = long, y = lat), size = 0.1) +
+    labs(x = "Longitude", y = "Latitude", title = paste(ldf[[6]]$date[1], "Surface Density", sep = " ")) +
+    geom_segment(data = filter(md, date == as.POSIXct("2020-09-03"), observation =="mt"), aes(y = start_lat, x = start_lon, yend = end_lat, xend = end_lon), color = "black", size = 1, inherit.aes = FALSE) +
+    geom_point(data = filter(md, date == as.POSIXct("2020-09-03"), observation =="ctd_profile"), aes(y = start_lat, x = start_lon), color = "black", shape = 4, size = 5) +
+    theme_classic()
+  ggsave(file = "figures/ctdUnderway/9.3.2020.jpg")
+  
+  ldf[[7]] <- filter(ldf[[7]], density>1025, longitude< -122.9, latitude< 38.35)
+  ggplot(ldf[[7]])+
+    geom_point(size = 3, shape = 21, color = "transparent", aes(x = longitude, y = latitude, fill = density))+
+    scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = mean(ldf[[7]]$density)) +
+    geom_point(data = coastline.df %>% dplyr::filter(long < max(ldf[[7]]$longitude) + 0.0075, long > min(ldf[[7]]$longitude), lat > min(ldf[[7]]$latitude) - 0.25, lat < max(ldf[[7]]$latitude)), aes(x = long, y = lat), size = 0.1) +
+    labs(x = "Longitude", y = "Latitude", title = paste(ldf[[7]]$date[1], "Surface Density", sep = " ")) +
+    geom_segment(data = filter(md, date == cruiseDates[6], observation =="mt"), aes(y = start_lat, x = start_lon, yend = end_lat, xend = end_lon), color = "black", size = 1, inherit.aes = FALSE) +
+    geom_point(data = filter(md, date == cruiseDates[6], observation =="ctd_profile"), aes(y = start_lat, x = start_lon), color = "black", shape = 4, size = 5) +
+    theme_classic()
+  ggsave(file = "figures/ctdUnderway/9.30.2020.jpg")
+  
+  ldf[[8]] <- filter(ldf[[8]], density>1025.32)
+  ggplot(ldf[[8]])+
+    geom_point(size = 3, shape = 21, color = "transparent", aes(x = longitude, y = latitude, fill = density))+
+    scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = mean(ldf[[8]]$density)) +
+    geom_point(data = coastline.df %>% dplyr::filter(long < max(ldf[[8]]$longitude) + 0.0075, long > min(ldf[[8]]$longitude), lat > min(ldf[[8]]$latitude) - 0.25, lat < max(ldf[[8]]$latitude)), aes(x = long, y = lat), size = 0.1) +
+    labs(x = "Longitude", y = "Latitude", title = paste(ldf[[8]]$date[1], "Surface Density", sep = " ")) +
+    geom_segment(data = filter(md, date == cruiseDates[7], observation =="mt"), aes(y = start_lat, x = start_lon, yend = end_lat, xend = end_lon), color = "black", size = 1, inherit.aes = FALSE) +
+    geom_point(data = filter(md, date == cruiseDates[7], observation =="ctd_profile"), aes(y = start_lat, x = start_lon), color = "black", shape = 4, size = 5) +
+    theme_classic()
+  ggsave(file = "figures/ctdUnderway/9.30.2020.jpg")
