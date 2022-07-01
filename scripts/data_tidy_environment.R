@@ -37,13 +37,15 @@ save(hfr, file = "data/environment/hfr.rda")
 
 n <- c("datetime_pdt", "speed")
 ids <- c("b1u", "b1v", "b2u", "b2v", "b6u", "b6v")
+
 for(i in 1:6){
 boonHFR[[i]] <- boonHFR[[i]][,c(2,4)]
 names(boonHFR[[i]]) <- n
-boonHFR[[i]]$datetime <- as.POSIXct(boonHFR[[i]]$datetime)
-boonHFR[[i]]$id <- rep(ids[i], nrow(b1u))
+boonHFR[[i]]$datetime_pdt <- as.POSIXct(boonHFR[[i]]$datetime_pdt)
+boonHFR[[i]]$id <- rep(ids[i], nrow(boonHFR[[i]]))
 }
-rbind()
+boonHFR.df <- do.call(rbind.data.frame, boonHFR)#bind all hfr rows
+save(boonHFR.df, file = "data/environment/hfr/boonHFR.rda")
 #====
 
 #WINDS

@@ -4,11 +4,13 @@
 
 library(tidyverse)
 library(taxize)
+library(gridExtra)
 library(viridis)
 library(reshape2)
 library(vegan)
 library(lubridate)
 library(broom)
+library(cowplot)
 load("data/biology/counts/plankton.rda")
 load("data/metadata.rda")
 
@@ -41,9 +43,9 @@ ggplot(div) +
 #SHANNON-WEINER INDEX
 #====
 #Set Up
-p <- select(plankton, location, date, depth, sample, spStage, count)
+p <- select(plankton, location, date, depth, sample, spStage, total)
 p <- filter(p, depth != "neuston", date != as.POSIXct("2019-07-18"))#remove neuston and cruise 1
-p.site.sp <- dcast(p, sample~spStage, value.var="count", fun.aggregate = mean)
+p.site.sp <- dcast(p, sample~spStage, value.var="total", fun.aggregate = mean)
 p.site.sp[is.na(p.site.sp)] <- 0
 tows <- select(us, sample, date, site, location, depth)
 tows <- distinct(tows)
@@ -102,7 +104,7 @@ orditorp(p.NMDS,display="sites",col="red",air=0.01)
 
 #====
 
-#TAXONOMIC SPECIFIC PLOTS
+#TAXONOMIC SPECIFIC PLOTS BY SURVEY
 #====
 z <- unique(us$date)
 results <- "figures/exploratoryPlots/taxaBySurvey/"
@@ -158,3 +160,40 @@ heatmap <- ggplot(filter(plankton, spStage %in% us$spStage), aes(x=loc.dep, y =s
   labs(x='', y ='Species_stage')+
   geom_segment(data=my.lines, aes(x,y,xend=xend, yend=yend), size=3, inherit.aes=F)
 heatmap
+#====
+
+#ANOVA SPECIES/STAGE BY LOCATION
+#====
+x <- unique(us$spStage)
+results <- "output/anova_speciesStage/"
+y <- dcast(us, sample~spStage, value.var="total", fun.aggregate = mean)
+y[is.na(y)] <- 0
+for (i in 1:length(x)) {#create plots for each species/stage
+  df <- filter(us, spStage==x[i])
+  stats <- summary(aov(total~location, df))
+  a <- ggplot(df, aes(location, total)) + geom_boxplot()
+  b <- ggplot(df, aes(sample, total)) + geom_point()
+  c <- ggdraw(a) + draw_label(paste("p = ", stats[[1]][1,5], sep = ""))
+  grid.arrange(c, b)
+  ggsave(paste(results,x[i],".jpg", sep = ""))
+}#====
+
+#GLM
+#====
+sums <- summarize(group_by_at(us, vars(spStage, date)), sum = sum(total))
+us <- left_join(us, sums)#add column for sum total of each spStage per survey
+us$prop <- us$total/us$sum#add column for proportion of each spStage per survey EU
+y <- dcast(us, sample~spStage, value.var="prop", fun.aggregate = mean)#create wide df
+y[is.na(y)] <- 0#Nas to zeros
+y <- left_join(y, distinct(select(us, sample, location, depth, date)))#add date
+taxa <- names(y)[2:49]#get list of all spStages
+
+for(i in 1:length(taxa)){#replace all missing observations by taxa
+df <- select(y, sample, date, as.character(taxa[i]))
+names(df) <- c("sample", "date", "taxa")
+df.2 <- summarize(group_by(df, date), sum = sum(taxa))#identify cruises where none of this taxa were observed (false zeros)
+no.obs <- df.2$date[which(df.2$sum ==0)]
+y[,1+i][which(y$date%in%no.obs)] <- "NA"#replace cruises without observations with NA
+}
+y[,2:49] <- lapply(y[,2:49], as.numeric)#change classes back to numeric
+#====
