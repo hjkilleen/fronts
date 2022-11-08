@@ -58,7 +58,6 @@ library(readxl)
 
 #Load plankton dataset with edited species and stage IDs
 plankton <- read_xlsx("data/biology/counts/planktonEdit.xlsx")
-save(plankton, file = "data/biology/counts/plankton.rda")
 #====
 
 #CRUISE METADATA
@@ -75,15 +74,37 @@ b2u <- read_csv("data/environment/hfr/bml_b2_u_avg_hourly.csv")
 b2v <- read_csv("data/environment/hfr/bml_b2_v_avg_hourly.csv")
 b6u <- read_csv("data/environment/hfr/bml_b6_u_avg_hourly.csv")
 b6v <- read_csv("data/environment/hfr/bml_b6_v_avg_hourly.csv")
-boonHFR <- list(b1u, b1v, b2u, b2v, b6u, b6v)
+b7u <- read_csv("data/environment/hfr/bml_b7_u_avg_hourly.csv")
+b7v <- read_csv("data/environment/hfr/bml_b7_v_avg_hourly.csv")
+boonHFR <- list(b1u, b1v, b2u, b2v, b6u, b6v, b7u, b7v)
 #====
 
-#HOURLY WINDS (deg, mph)
+#WINDS
 #====
+#BOON Hourly (deg, mph)
 wd19 <- read_csv("data/environment/BOONwind/bml_wind_direction_2019_hourly.csv")
 ws19 <- read_csv("data/environment/BOONwind/bml_wind_speed_2019_hourly.csv")
 wd20 <- read_csv("data/environment/BOONwind/bml_wind_direction_2020_hourly.csv")
 ws20 <- read_csv("data/environment/BOONwind/bml_wind_speed_2020_hourly.csv")
+
+#BOON DAILY
+wsDay19 <- read_csv("data/environment/BOONwind/bml_wind_speed_2019_daily.csv")
+wdDay19 <- read_csv("data/environment/BOONwind/bml_wind_direction_2019_daily.csv")
+wsDay20 <- read_csv("data/environment/BOONwind/bml_wind_speed_2020_daily.csv")
+wdDay20 <- read_csv("data/environment/BOONwind/bml_wind_direction_2020_daily.csv")
+
+#46013 NDBC
+offwind2019 <- read.table("data/environment/46013wind/46013h2019.txt")
+offwind2020 <- read.table("data/environment/46013wind/46013h2020.txt")
 #====
 
+#CUTI
+#====
+cuti <- read_csv("data/environment/CUTI_daily.csv")
+#====
 
+#BOON TEMPERATURE
+#====
+temp2019 <- read_csv("data/environment/BOONtemp/bml_seawater_temperature_2019_daily.csv")
+temp2020 <- read_csv("data/environment/BOONtemp/bml_seawater_temperature_2020_daily.csv")
+#====
