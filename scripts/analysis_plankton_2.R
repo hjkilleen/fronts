@@ -19,31 +19,26 @@ load("data/metadata.rda")
 plankton <- filter(plankton, !is.na(location), depth != "neuston")
 plankton$location <- factor(plankton$location, levels = c("onshore", "front", "offshore"))#set depth bin order
 plankton$depth <- factor(plankton$depth, levels = c("surface", "bottom"))
+p <- dplyr::select(filter(plankton, n>2), location, date, depth, sample, spStage, total)
+p <- dplyr::filter(p, depth != "neuston", date != as.POSIXct("2019-07-18"))#remove
 x <- tally(group_by(plankton, spStage))
 plankton <- left_join(plankton, x)
 us <- filter(plankton, n>20)
-
-#Boxplot of bulk abundance
-plankton <- left_join(plankton, summarize(group_by(plankton, sample, tot_per_tow = sum(total))))
-ggplot(plankton) + 
-  geom_boxplot(aes(location, tot_per_tow)) + 
-  labs(x = "Location", y = "Count/5 min tow") + 
-  theme(text = element_text(size = 15), axis.text = element_text(size = 15))
 
 #Boxplot of diversity
 div <- plankton %>% group_by_at(.vars = c("location", "depth", "date")) %>% tally()#df with number of species_stages per observational unit
 
 ggplot(div) + 
   geom_boxplot(aes(location, n)) + 
-  labs(x = "Location", y = "Count/5 min tow") + 
+  labs(x = "Location", y = "Richness") + 
   theme(text = element_text(size = 15), axis.text = element_text(size = 15))
+anova(lm(n~location, div))
 #====
 
 #SHANNON-WEINER INDEX
 #====
 #Set Up
-p <- dplyr::select(filter(plankton, n>2), location, date, depth, sample, spStage, total)
-p <- dplyr::filter(p, depth != "neuston", date != as.POSIXct("2019-07-18"))#remove
+
 p.site.sp <- dcast(p, sample~spStage, value.var="total", fun.aggregate = mean)
 p.site.sp[is.na(p.site.sp)] <- 0
 tows <- dplyr::select(us, sample, date, site, location, depth)
