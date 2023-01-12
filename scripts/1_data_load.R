@@ -12,8 +12,6 @@ library(readxl)
 #====
 #Load plankton dataset with edited species and stage IDs
 plankton <- read_csv("data/biology/counts/plankton.csv")
-plankton$species[which(plankton$species=="Harpactacoid")] = "Calanoid"
-write_csv(plankton, "data/biology/counts/plankton.csv")
 #====
 
 #LOAD CRUISE METADATA
