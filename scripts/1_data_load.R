@@ -12,6 +12,8 @@ library(readxl)
 #====
 #Load plankton dataset with edited species and stage IDs
 plankton <- read_csv("data/biology/counts/plankton.csv")
+plankton$species[which(plankton$species=="Harpactacoid")] = "Calanoid"
+write_csv(plankton, "data/biology/counts/plankton.csv")
 #====
 
 #LOAD CRUISE METADATA
@@ -52,6 +54,12 @@ boonTemp <- read_csv("data/environment/BOONtemp/boonTemp.csv")
 #====
 ctdMD <- read_csv("data/environment/CTD/cleaned/Profiles/ctdMD.csv")
 allCTD <- read_csv("data/environment/CTD/cleaned/Profiles/allCTD.csv")
+#====
+
+#LOAD UNDERWAY DATA
+#====
+filenames <- list.files("data/environment/CTD/cleaned/Underway/", full.names = TRUE)
+ldf <- lapply(filenames, read.table)
 #====
 
 #Go to 2_data_tidy_plankton
