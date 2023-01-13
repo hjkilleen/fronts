@@ -1,17 +1,9 @@
 #Script to analyze plankton community data
 
-# Fri Dec 17 08:23:38 2021 ------------------------------
+# Thu Jan 12 16:30:53 2023 ------------------------------
 
 #LIBRARIES & SOURCES
 #====
-library(tidyverse)
-library(taxize)
-library(gridExtra)
-library(viridis)
-library(lubridate)
-library(broom)
-library(cowplot)
-
 library(reshape2)
 library(vegan)
 
@@ -112,6 +104,6 @@ legend(x = 0, y = 1, legend = c("onshore", "front", "offshore"), bty = 'n', fill
 
 #Species Scores
 sppscores(p.NMDS) <- p.comm
-summary(p.NMDS$species)
-View(p.NMDS$species)
+saveRDS(summary(p.NMDS$species), file = "output/nmds_spp_scores_summary.rda")
+saveRDS(p.NMDS$species, file = "output/nmds_spp_scores.rda")
 #====
