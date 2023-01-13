@@ -4,13 +4,18 @@
 
 #LIBARIES & SOURCES
 #====
+library(lubridate)
+
 source("scripts/1_data_load.R")
 #====
 
-#SET COLUMN CLASSES
+#SET COLUMN CLASSES & LEVELS
 #====
 plankton$date <- as.POSIXct(plankton$date)#date
-plankton[,c(2:5, 7:8, 10)] <- lapply(plankton[,c(2:5, 7:8, 10)], factor)#
+plankton[,c(2:5, 7:8, 10)] <- lapply(plankton[,c(2:5, 7:8, 10)], factor)
+
+plankton$location <- factor(plankton$location, levels = c("onshore", "front", "offshore"))#set location and depth bin order
+plankton$depth <- factor(plankton$depth, levels = c("surface", "bottom"))
 #====
 
 #DERIVED VARIABLES
@@ -20,6 +25,10 @@ plankton$spStage <- paste(plankton$species, plankton$stage, sep = "_")
 
 #create a new variable for count * split (count/five min. tow)
 plankton$sampleCount <- plankton$count*plankton$split
+
+#create a tally showing the number of samples in which each spStage was observed
+x <- tally(group_by(plankton, spStage))
+plankton <- left_join(plankton, x)
 
 #merge plankton with flow meter data
 x <- select(filter(md, observation == "mt"), tow_cast, start_flow, end_flow, start_time_pdt, end_time)
@@ -46,17 +55,15 @@ plankton$volume_total <- plankton$total_time*plankton$speed_cm_per_sec*625/10000
 plankton$total <- plankton$sampleCount/plankton$volume_total
 #====
 
+#FILTER DATASET
+#====
+plankton <- filter(plankton, depth != "neuston") %>% droplevels()#drop samples collected in neuston, not analyzed
+plankton <- filter(plankton, date != as_datetime("2019-07-18")) %>% droplevels()#drop samples from cruise 1, note analyzed
+#====
+
 #SAVE
 #====
 save(plankton, file = "data/biology/counts/plankton.rda")
 #====
 
 #Go to 3_data_tidy_environment
-
-
-
-
-# Stacked Plot to explore plankton distributions in cruise 3
-#ggplot(filter(cruise3, species == "calanoid"), aes(fill=depth, y=total, x=location)) +
-  #geom_bar(position="stack", stat="identity")
-
