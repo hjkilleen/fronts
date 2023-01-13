@@ -7,6 +7,7 @@
 library(lubridate)
 library(geosphere)
 library(openair)
+library(data.table)
 
 source("scripts/1_data_load.R")
 source("scripts/functions/shift.wind.R")
@@ -26,7 +27,7 @@ save(hfr, file = "data/environment/hfr/sea_water_velocity.rda")
 
 #Fix BOON currents
 boonHFR$datetime_pdt <- with_tz(boonHFR$datetime_pdt+25200, tz = "America/Los_Angeles")
-save(boonHFR.df, file = "data/environment/hfr/boonHFR.rda")
+save(boonHFR, file = "data/environment/hfr/boonHFR.rda")
 #====
 
 #WINDS
@@ -79,9 +80,9 @@ offwind <- filter(offwind, date>as.POSIXct("2019-07-01"), date<as.POSIXct("2020-
 save(offwind, file = "data/environment/46013wind/offwind.rda")
 #====
 
-#CTD
+#CTD PROFILER
 #====
-#Umcomment to add new CTD data
+# #Uncomment to add new CTD data
 # #Create data table for all CTD files
 # list_of_files <- list.files(path = "data/environment/CTD/cleaned/Profiles/", recursive = TRUE,
 #                             pattern = "\\.asc$",
@@ -91,7 +92,7 @@ save(offwind, file = "data/environment/46013wind/offwind.rda")
 # listCTD <- sapply(list_of_files, fread, simplify = FALSE)
 # listCTD <- lapply(listCTD, function(df){#remove soak time
 #   if(nrow(df)>30){
-#     df <- df[-c(1:30),]
+#     df <- df[-c(1:25),]
 #   }
 # })
 # listCTD[sapply(listCTD, is.null)] <- NULL#remove empty items
@@ -106,17 +107,7 @@ save(offwind, file = "data/environment/46013wind/offwind.rda")
 #                           use.names = TRUE, idcol = "filename")
 # names(allCTD) <- c("filename", "date", "time_UTC", "PrdM", "temp_C", "C0S/m", "depth_M", "salinity_psu", "density")
 # #create CSV
-# write_csv(allCTD, path = "data/environment/CTD/cleaned/Profiles/allCTD.csv")
-
-# #CTD metadata
-# ctdMD <- data.frame(
-#   filename = unique(allCTD$filename),
-#   date = rep(NA, length(unique(allCTD$filename))),
-#   location = rep(NA, length(unique(allCTD$filename))),
-#   lat = rep(NA, length(unique(allCTD$filename))),
-#   lon = rep(NA, length(unique(allCTD$filename)))
-# )
-# write_csv(ctdMD, path = "data/environment/CTD/cleaned/Profiles/ctdMD.csv")
+# write_csv(allCTD, file = "data/environment/CTD/cleaned/Profiles/allCTD.csv")
 
 allCTD$date <- as_date(allCTD$date, format = "%m/%d/%Y")#date variable
 ctdMD$date <- as_date(ctdMD$date, format = "%m/%d/%y")#date variable
@@ -134,4 +125,44 @@ allCTD <- filter(allCTD, temp_C>6)
 save(allCTD, file = "data/environment/CTD/cleaned/Profiles/allCTD.rda")
 #====
 
+#UNDERWAY CTD
+#====
+#RESTRUCTURE/CLEAN DATA
+ldf <- lapply(ldf, function(df){df = df[-1,]})
+names10 <- c("date", "time_UTC", "pressure", "temp", "conductivity", "latitude", "longitude", "depth", "salinity", "density")
+names8 <- c("date", "time_UTC", "pressure", "temp", "conductivity", "depth", "salinity", "density")
+for(i in seq(1:9)){if(ncol(ldf[[i]]) == 10){
+  names(ldf[[i]]) <- names10
+}
+  else {
+    names(ldf[[i]]) <- names8
+  }}
+#set classes
+for(i in c(1,2,4:9)){
+  ldf[[i]]$latitude <- as.numeric(as.character(ldf[[i]]$latitude))
+  ldf[[i]]$longitude <- as.numeric(as.character(ldf[[i]]$longitude))
+  ldf[[i]]$density <- as.numeric(as.character(ldf[[i]]$density))
+  ldf[[i]]$temp <- as.numeric(as.character(ldf[[i]]$temp))
+}
+#add PDT time
+for(i in seq(1:9)){
+  ldf[[i]]$datetime <- paste(ldf[[i]]$date, ldf[[i]]$time_UTC, sep = " ")
+  ldf[[i]]$datetime <- parse_date_time(ldf[[i]]$datetime, orders = "mdy HMS")
+  ldf[[i]]$datetime_PDT <- with_tz(ldf[[i]]$datetime, "America/Los_Angeles")
+}
+#start and end times that pair with list items
+times <- data.frame(
+  start.times_PDT = as.POSIXct(c("2019-08-15 10:45:00 PDT", "2019-09-20 9:21:00 PDT", "2020-06-23 11:39:00 PDT", "2020-06-30 10:26:00 PDT", "2020-07-28 10:30:00 PDT", "2020-09-03 11:03:00 PDT", "2020-09-30 10:30:00 PDT", "2020-10-06 9:47:00 PDT", "2020-10-06 10:47:00 PDT")),
+  end.times_PDT = as.POSIXct(c("2019-08-15 11:05:00 PDT", "2019-09-20 11:43:00 PDT", "2020-06-23 12:03:00 PDT", "2020-06-30 10:46:00 PDT", "2020-07-28 11:08:00 PDT", "2020-09-03 11:37:00 PDT", "2020-09-30 12:35:00 PDT", "2020-10-06 10:40:00 PDT", "2020-10-06 12:39:00 PDT"))
+)
+#filter underway data
+for(i in seq(1:9)){
+  ldf[[i]] <- ldf[[i]][ldf[[i]]$datetime_PDT > times[i,1],]
+  ldf[[i]] <- ldf[[i]][ldf[[i]]$datetime_PDT < times[i,2],]
+}
+names(ldf) <- c("cruise3", "cruise4", "cruise5", "cruise6", "cruise7", "cruise8", "cruise9", "cruise10", "cruise10.2", "x")
+save(ldf, file = "data/environment/CTD/cleaned/Underway/allUnderway.rda")
+#====
+
 #Go to 4_analysis_ctdProfiles
+
