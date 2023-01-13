@@ -15,6 +15,7 @@ load("data/environment/CTD/cleaned/Profiles/allCTD.rda")
 #====
 results <- "figures/ctdProfiles/"
 temp_list <- list()
+ctdDates <- as.POSIXct(c("2019-09-20", "2020-06-23", "2020-06-30", "2020-09-30"))
 
 for(i in 1:length(ctdDates)){#Interpolate and create plots for each cruise
   d <- filter(allCTD, date == ctdDates[i])
@@ -26,12 +27,12 @@ for(i in 1:length(ctdDates)){#Interpolate and create plots for each cruise
   p <- ggplot(df, aes(Distance, Depth)) + 
     geom_raster(aes(fill = Temp), interpolate = F) + 
     geom_contour(aes(z = Temp)) + 
-    geom_point(data = d, aes(trans_dist_m, depth_M), color = "grey") + 
+    geom_point(data = d, aes(trans_dist_m, depth_M), color = "black") + 
     # ylim(0,100) + 
     # xlim(0, 35) +
-    labs(x = "Transect (m)", y = "Depth (m)") + 
+    labs(x = "Distance from onshore cast (m)", y = "Depth (m)") + 
     scale_y_reverse() + 
-    scale_fill_gradientn(low = "blue", mid = "white", high = "red", midpoint = mean(na.omit(df$Temp))) + 
+    scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = mean(na.omit(df$Temp)), na.value = "transparent", name = "Temp °C") + 
     theme_light()
   print(p)
   ggsave(paste(results, gsub("/",".",ctdDates[i]), ".pdf", sep = ""))
@@ -60,12 +61,12 @@ for(i in 1:length(ctdDates)){#Interpolate and create plots for each cruise
   p <- ggplot(df, aes(Distance, Depth)) + 
     geom_raster(aes(fill = Sal), interpolate = F) + 
     geom_contour(aes(z = Sal)) + 
-    geom_point(data = d, aes(trans_dist_m, depth_M), color = "grey") + 
+    geom_point(data = d, aes(trans_dist_m, depth_M), color = "black") + 
     # ylim(0,100) + 
     # xlim(0, 35) +
-    labs(x = "Transect (m)", y = "Depth (m)") + 
+    labs(x = "Distance from onshore cast (m)", y = "Depth (m)") + 
     scale_y_reverse() + 
-    scale_fill_gradientn(colors = viridis_pal()(20), na.value = "transparent") + 
+    scale_fill_gradientn(colors = viridis_pal()(20), na.value = "transparent", name = "Salinity (psu)") + 
     theme_light()
   print(p)
   ggsave(paste(results, gsub("/",".",ctdDates[i]), ".pdf", sep = ""))
