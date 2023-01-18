@@ -11,7 +11,7 @@ library(readxl)
 #LOAD PLANKTON DATA
 #====
 #Load plankton dataset with edited species and stage IDs
-plankton <- read_csv("data/biology/counts/plankton.csv")
+plankton <- read_xlsx("data/biology/counts/plankton.xlsx")
 #====
 
 #LOAD CRUISE METADATA

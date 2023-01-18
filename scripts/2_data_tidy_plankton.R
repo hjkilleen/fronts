@@ -12,7 +12,7 @@ source("scripts/1_data_load.R")
 #SET COLUMN CLASSES & LEVELS
 #====
 plankton$date <- as.POSIXct(plankton$date)#date
-plankton[,c(2:5, 7:8, 10)] <- lapply(plankton[,c(2:5, 7:8, 10)], factor)
+plankton[,c(2:5, 7:8)] <- lapply(plankton[,c(2:5, 7:8)], factor)
 
 plankton$location <- factor(plankton$location, levels = c("onshore", "front", "offshore"))#set location and depth bin order
 plankton$depth <- factor(plankton$depth, levels = c("surface", "bottom"))
@@ -58,7 +58,7 @@ plankton$total <- plankton$sampleCount/plankton$volume_total
 #FILTER DATASET
 #====
 plankton <- filter(plankton, depth != "neuston") %>% droplevels()#drop samples collected in neuston, not analyzed
-plankton <- filter(plankton, date != as_datetime("2019-07-18")) %>% droplevels()#drop samples from cruise 1, note analyzed
+plankton <- filter(plankton, date != as.POSIXct("2019-07-18")) %>% droplevels()#drop samples from cruise 1, note analyzed
 #====
 
 #SAVE
