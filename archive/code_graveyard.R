@@ -536,3 +536,65 @@ for(i in 1:length(taxa)){#replace all missing observations by taxa
 }
 y[,2:49] <- lapply(y[,2:49], as.numeric)#change classes back to numeric
 #====
+
+
+#Facet plot of rare species
+
+rare <- filter(plankton, !spStage %in% taxa.us, n > 2)
+y.rare <- dcast(rare, sample~spStage, value.var = "total", fun.aggregate = mean)#create wide df
+y.rare[is.na(y.rare)] <- 0#Nas to zeros (cruises without observations as well as real zeros)
+
+
+ggplot(data = rare, aes(x = location, y = total, color = depth)) +
+  geom_boxplot() +
+  facet_wrap(~spStage, scales = "free") +
+  labs(x = "Location", y = "Log(Total Count)") +
+  guides(color = guide_legend(title = "Depth")) +
+  theme_classic() +
+  theme(axis.title = element_text(size = 20), legend.text = element_text(size = 15), legend.title = element_text(size = 20))
+
+#Type Model Selection
+#Set up
+y.us <- dcast(us, sample~spStage, value.var = "sampleCount", fun.aggregate = mean)#create wide df
+y.us[is.na(y.us)] <- 0
+y.us <- left_join(y.us, distinct(dplyr::select(us, sample, location, depth, date, volume_total)))
+
+
+
+
+#GLM 2 Using a mix of glm packages
+#====
+plankton <- filter(plankton, date != as.POSIXct("2019-07-18"))#get rid of 7/18 (incomplete cruise)
+us <- filter(us, date != as.POSIXct("2019-07-18"))
+y <- dcast(plankton, sample~spStage, value.var = "sampleCount", fun.aggregate = mean)#create wide df
+y.us <- dcast(us, sample~spStage, value.var = "sampleCount", fun.aggregate = mean)#create wide df
+y[is.na(y)] <- 0#Nas to zeros (cruises without observations as well as real zeros)
+y.us[is.na(y.us)] <- 0
+
+y <- left_join(y, distinct(dplyr::select(plankton, sample, location, depth, date, volume_total)))#add date
+y.us <- left_join(y.us, distinct(dplyr::select(us, sample, location, depth, date, volume_total)))
+
+taxa <- names(y)[2:124]#get list of all spStages
+taxa.us <- names(y.us)[2:18]
+
+m1 <- MASS::glmmPQL(calanoid_adult~location+depth:location, random = ~ 1|date, family = "negbinomial", data = filter(select(y, c("location", "depth", "date", "calanoid_adult")), calanoid_adult<400000))
+m2 <- MASS::glm.nb(gastropod_veliger~location+depth:location, data = select(y, location, depth, date, gastropod_veliger))
+
+m3 <- glmer.nb(gastropod_veliger~location+depth:location+(1|date), data = filter(select(y, c("location", "depth", "date", "gastropod_veliger"))))
+ss <- getME(m3, c("theta", "fixef"))
+m4 <- update(m3, start = ss, control = glmerControl(optCtrl = list(maxfun = 2e4)))
+m5 <- glmm.zinb(gastropod_veliger~location+location:depth, random = ~ 1 | date, data = dplyr::select(y, location, depth, date, gastropod_veliger), zi_fixed = ~1)
+summary(m5)
+pscl::odTest(m2)
+check_zeroinflation(m2)
+car::Anova(m5)
+
+tt <- getME(m3,"theta")
+ll <- getME(m3,"lower")
+min(tt[ll==0])
+#====
+
+x$fit <- exp(fitted(m3))#get fitted values
+ggplot(x) + #plot fitted values over raw data
+  geom_boxplot(aes(x = location, y = balanus.crenatus_cyprid, color = depth)) +
+  geom_boxplot(aes(x = location, y = fit, color = depth), width = 0.1)

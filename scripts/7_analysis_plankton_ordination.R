@@ -47,7 +47,6 @@ levels(p.env$location) <- c("front", "onshore", "offshore")
 p.env$date <- as.factor(p.env$date)
 
 p.NMDS <- metaMDS(p.dist, k=2)#run NMDS
-saveRDS(p.NMDS, file = "output/nmds.rda")
 
 scrs <-#calculate centroids
   scores(p.NMDS, display = "sites", "species")
