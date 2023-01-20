@@ -10,6 +10,7 @@ library(performance)
 library(multcomp)
 
 library(glmmTMB)
+library(reshape2)
 library(tidyverse)
 library(car)
 library(emmeans)
@@ -25,6 +26,20 @@ tows <- dplyr::select(us, sample, date, site, location, depth) %>% distinct()#ge
 y.us <- dcast(us, sample~spStage, value.var = "sampleCount", fun.aggregate = mean)#create wide df
 y.us[is.na(y.us)] <- 0
 y.us <- left_join(y.us, distinct(dplyr::select(us, sample, location, depth, date, volume_total)))
+
+mefx <- data.frame("type" = rep(NA, 17),#create dataframe to store model main effects
+                      "location_chi" = rep(NA, 17),
+                      "location_p" = rep(NA, 17),
+                      "location:depth_chi" = rep(NA, 17),
+                      "location:depth_p" = rep(NA, 17))
+
+pairs <- data.frame("type",#create dataframe to store model pairwise comparisons for location
+                    "on_f_est",
+                    "on_f_p",
+                    "on_off_est",
+                    "on_off_p",
+                    "f_off_est",
+                    "f_off_p")
 #====
 
 #TAXA-SPECIFIC HURDLE MODELS
@@ -47,61 +62,34 @@ m3 <- update(m2, ~. + (1|date))#with random variable for date
 AIC(m0, m1, m2, m3)#select model with lowest AIC value
 
 summary(m3)#Simple effects and model diagnostics
-Anova(m3, test = "Chisq")#main effects
+Anova(m3)#main effects
+
+mefx[1,] <- c("Balanus crenatus cyprid", 1.231, 0.540, 9.108, 0.027)
 
 emmeans(m3, pairwise~location:depth)
 
 
-#Balanus crenatus cyprids
-mods.balanus.crenatus_cyprid <- list()#set up
-x <- dplyr::select(y.us, date, location, depth, balanus.crenatus_cyprid, volume_total)
-
-ggplot(x) + #search for outliers
-  geom_boxplot(aes(x = location, y = balanus.crenatus_cyprid, color = depth))
-
-mods.balanus.crenatus_cyprid[[1]] <- MASS::glm.nb(balanus.crenatus_cyprid~location+depth:location +offset(log(volume_total)), data = y.us)#Neg bin for testing
-odTest(mods.balanus.crenatus_cyprid[[1]])#test for overdispersaion (p<0.05)
-check_zeroinflation(mods.balanus.crenatus_cyprid[[1]])#test for zero inflation (ration<1)
-
-mods.balanus.crenatus_cyprid[[2]] <- NULL#Neg bin GLMM if not zero inflated
-
-mods.balanus.crenatus_cyprid[[3]] <- glmm.zinb(balanus.crenatus_cyprid~location+location:depth + offset(log(volume_total)), random = ~ 1 | date, data = x, zi_fixed = ~1)#Zero inflated neg bin GLMM
-
-summary(mods.balanus.crenatus_cyprid[[3]])#Simple effects and model diagnostics
-anova(mods.balanus.crenatus_cyprid[[3]], test = "Chisq")#main effects
-
-x$fit <- exp(fitted(mods.balanus.crenatus_cyprid[[3]]))#get fitted values
-ggplot(x) + #plot fitted values over raw data
-  geom_boxplot(aes(x = location, y = balanus.crenatus_cyprid, color = depth)) +
-  geom_boxplot(aes(x = location, y = fit, color = depth), width = 0.1)
-
-emmeans(mods.balanus.crenatus_cyprid[[3]], pairwise~location:depth)
-
-
-
 #Balanus crenatus nauplius
-mods.balanus.crenatus_nauplius4.5 <- list()#set up
 x <- dplyr::select(y.us, date, location, depth, balanus.crenatus_nauplius4.5, volume_total)
 
-ggplot(x) + #look for outliers
+ggplot(x) + #search for outliers
   geom_boxplot(aes(x = location, y = balanus.crenatus_nauplius4.5, color = depth))
 
-mods.balanus.crenatus_nauplius4.5[[1]] <- MASS::glm.nb(balanus.crenatus_nauplius4.5~location+depth:location+offset(log(volume_total)), data = x)#Neg bin GLM for testing
-odTest(mods.balanus.crenatus_nauplius4.5[[1]])#test for overdispersion (p<0.05)
-check_zeroinflation(mods.balanus.crenatus_nauplius4.5[[1]])#test for zero inflation (ratio<1)
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(balanus.crenatus_nauplius4.5))
 
-mods.balanus.crenatus_nauplius4.5[[2]] <- NULL#Neg bin GLMM, if not zero inflated
+#Hurdle models for testing
+m0 <- glmmTMB(balanus.crenatus_nauplius4.5~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
 
-mods.balanus.crenatus_nauplius4.5[[3]] <- glmm.zinb(balanus.crenatus_nauplius4.5~location+location:depth+offset(log(volume_total)), random = ~ 1 | date, data = x, zi_fixed = ~1)##Zero inflated neg bin GLMM
+AIC(m0, m1, m2, m3)#select model with lowest AIC value
 
-summary(mods.balanus.crenatus_nauplius4.5[[3]])#Simple effects and model diagnostics
-anova(mods.balanus.crenatus_nauplius4.5[[3]], test = "Chisq")#Main effects
+summary(m3)#Simple effects and model diagnostics
+Anova(m3)#main effects
 
-x$fit <- exp(fitted(mods.balanus.crenatus_nauplius4.5[[3]]))#Get fitted values
-ggplot(x) + #Plot fitted values over raw data
-  geom_boxplot(aes(x = location, y = balanus.crenatus_nauplius4.5, color = depth)) +
-  geom_boxplot(aes(x = location, y = fit, color = depth), width = 0.1)
-
+mefx[2,] <- c("Balanus crenatus late nauplius", 1.580, 0.454, 1.034, 0.793)
 
 #Bivalve umbo
 mods.bivalve_umbo <- list()#set up

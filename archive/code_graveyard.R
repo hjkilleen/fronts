@@ -598,3 +598,30 @@ x$fit <- exp(fitted(m3))#get fitted values
 ggplot(x) + #plot fitted values over raw data
   geom_boxplot(aes(x = location, y = balanus.crenatus_cyprid, color = depth)) +
   geom_boxplot(aes(x = location, y = fit, color = depth), width = 0.1)
+
+
+#Balanus crenatus cyprids
+mods.balanus.crenatus_cyprid <- list()#set up
+x <- dplyr::select(y.us, date, location, depth, balanus.crenatus_cyprid, volume_total)
+
+ggplot(x) + #search for outliers
+  geom_boxplot(aes(x = location, y = balanus.crenatus_cyprid, color = depth))
+
+mods.balanus.crenatus_cyprid[[1]] <- MASS::glm.nb(balanus.crenatus_cyprid~location+depth:location +offset(log(volume_total)), data = y.us)#Neg bin for testing
+odTest(mods.balanus.crenatus_cyprid[[1]])#test for overdispersaion (p<0.05)
+check_zeroinflation(mods.balanus.crenatus_cyprid[[1]])#test for zero inflation (ration<1)
+
+mods.balanus.crenatus_cyprid[[2]] <- NULL#Neg bin GLMM if not zero inflated
+
+mods.balanus.crenatus_cyprid[[3]] <- glmm.zinb(balanus.crenatus_cyprid~location+location:depth + offset(log(volume_total)), random = ~ 1 | date, data = x, zi_fixed = ~1)#Zero inflated neg bin GLMM
+
+summary(mods.balanus.crenatus_cyprid[[3]])#Simple effects and model diagnostics
+anova(mods.balanus.crenatus_cyprid[[3]], test = "Chisq")#main effects
+
+x$fit <- exp(fitted(mods.balanus.crenatus_cyprid[[3]]))#get fitted values
+ggplot(x) + #plot fitted values over raw data
+  geom_boxplot(aes(x = location, y = balanus.crenatus_cyprid, color = depth)) +
+  geom_boxplot(aes(x = location, y = fit, color = depth), width = 0.1)
+
+emmeans(mods.balanus.crenatus_cyprid[[3]], pairwise~location:depth)
+
