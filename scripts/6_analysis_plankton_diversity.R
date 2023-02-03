@@ -39,7 +39,7 @@ saveRDS(sw.anova, file = "output/swAnova.rda")
 ggplot(p.site.sp) + 
   geom_boxplot(aes(location, diversity, color = depth)) +
   labs(x = "Location", y = "Shannon Index") +
-  scale_color_discrete(name = "Depth", labels = c("Surface", "Bottom")) +
+  scale_color_grey(name = "Depth", labels = c("Surface", "Bottom")) +
   scale_x_discrete(labels = c("Onshore", "Front", "Offshore")) + 
   theme_classic() +
   theme(text = element_text(size = 20))
