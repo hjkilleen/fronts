@@ -13,7 +13,7 @@ load("data/environment/CTD/cleaned/Profiles/allCTD.rda")
 
 #INTERPOLATE & PLOT TEMPERATURE PROFILES
 #====
-results <- "figures/ctdProfiles/"
+results <- "figures/ctdProfiles/temperature/"
 temp_list <- list()
 ctdDates <- as.POSIXct(c("2019-09-20", "2020-06-23", "2020-06-30", "2020-09-30"))
 
@@ -30,12 +30,13 @@ for(i in 1:length(ctdDates)){#Interpolate and create plots for each cruise
     geom_point(data = d, aes(trans_dist_m, depth_M), color = "black") + 
     # ylim(0,100) + 
     # xlim(0, 35) +
-    labs(x = "Distance from onshore cast (m)", y = "Depth (m)") + 
+    labs(x = "", y = "Depth (m)") + 
     scale_y_reverse() + 
     scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = mean(na.omit(df$Temp)), na.value = "transparent", name = "Temp °C") + 
-    theme_light()
+    theme_classic() +
+    theme(text = element_text(size = 20), axis.text = element_text(size = 10))
   print(p)
-  ggsave(paste(results, gsub("/",".",ctdDates[i]), ".pdf", sep = ""))
+  ggsave(paste(results, gsub("/",".",ctdDates[i]), ".jpg", sep = ""))
   temp_list[[i]] = p
 }
 
@@ -53,7 +54,7 @@ results <- "figures/ctdProfiles/salinity/"
 for(i in 1:length(ctdDates)){#Interpolate and create plots for each cruise
   d <- filter(allCTD, date == ctdDates[i])
   d <- na.omit(d)#remove NAs
-  d <- filter(d, salinity_psu>25)#omit misreads that fall well below typical salinity values
+  d <- filter(d, salinity_psu>31)#omit misreads that fall well below typical salinity values
   mba <- mba.surf(d[,c("trans_dist_m", "depth_M", "salinity_psu")], no.X = 300, no.Y = 300, n = 1, m = 1)
   dimnames(mba$xyz.est$z) <- list(mba$xyz.est$x, mba$xyz.est$y)
   df <- reshape2::melt(mba$xyz.est$z, varnames = c("Distance", "Depth"), value.name = "Sal")

@@ -15,6 +15,10 @@ source("scripts/5_analysis_ctdUnderway.R")
 #====
 blank <- ggplot() +
   theme_void()#create blanks for missing datatypes
+blank_leg <- ggplot() + #create blank with CTD y axis label
+  labs(x = "Distance from onshore cast (m)", y = "") + 
+  theme(text = element_text(size = 20), panel.background = element_rect(fill = "transparent"))
 
-ggarrange(cruise3.hfr, cruise3.uw, blank, cruise4.hfr, blank, cruise4.ctd, cruise5.hfr, cruise5.uw, cruise5.ctd, cruise6.hfr, cruise6.uw, cruise6.ctd, cruise9.hfr, cruise9.uw, cruise9.ctd, cruise10.hfr, cruise10.uw, blank, ncol = 3, nrow = 6)
+ggarrange(cruise3.hfr, cruise3.uw, blank, cruise4.hfr, blank, cruise4.ctd, cruise5.hfr, cruise5.uw, cruise5.ctd, cruise6.hfr, cruise6.uw, cruise6.ctd, cruise9.hfr, cruise9.uw, cruise9.ctd, cruise10.hfr, cruise10.uw, blank_leg, ncol = 3, nrow = 6)
+ggsave("figures/surveyEnvironment/surveyEnvironment.jpg", width = 20, height = 14, units = "in", dpi = 300)
 #====
