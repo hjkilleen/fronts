@@ -1,0 +1,18 @@
+type,location_chi,location_p,location.depth_chi,location.depth_p
+Balanus crenatus cyprid,1.231,0.54,9.108,0.027
+Balanus crenatus late nauplius,1.58,0.454,1.034,0.793
+Bivalve veliger,15.635,4e-04,8.306,0.04
+Chthamalus cyprid,29.424,4e-07,6.198,0.102
+Gastropod veliger,2.386,0.303,14.146,0.003
+Pinnotherid early zoea,50.04,0.081,2.246,0.523
+Polychaete larva,2.487,0.288,18.412,4e-04
+Calanoid adult,8.843,0.012,6.932,0.074
+Copepod metanauplius,15.489,4e-04,6.597,0.0859
+Copepod nauplius,1.022,0.56,0.29,0.962
+Cyclopoid adult,4.1,0.129,9.519,0.023
+Evadne adult,11.051,0.004,0.331,0.954
+Larvacean,9.283,0.01,0.521,0.914
+Podon adult,12.313,0.002,2.47,0.481
+Diatom,7.801,0.02,5.37,0.147
+Large egg,1.174,0.557,1.378,0.711
+Small egg,10.445,0.005,0.381,0.944

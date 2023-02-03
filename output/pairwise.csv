@@ -1,0 +1,5 @@
+type,on_f_est,on_f_p,on_off_est,on_off_p,f_off_est,f_off_p
+Bivalve veliger,-2.14,0.0024,-1.578,0.0346,0.562,0.6593
+Chthamalus cyprid,-0.666,0.1862,1.431,0.0052,2.097,2e-04
+Copepod metanauplius,0.201,0.9602,-2.773,0.0042,-2.975,0.0054
+Podon adult,0.172,0.8651,-0.937,0.032,-1.109,0.0054
