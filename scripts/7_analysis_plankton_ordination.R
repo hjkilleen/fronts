@@ -10,10 +10,10 @@ library(vegan)
 load("data/biology/counts/plankton.rda")
 #====
 
-#COMMUNITY ANALYSIS OF SIMILARITY
+#CREATE DISTANCE MATRIX 
 #====
 #select grouping metadata
-p <- dplyr::select(filter(plankton, n>2), location, date, depth, sample, spStage, total)#omit very rare species
+p <- dplyr::select(filter(plankton, n>3), location, date, depth, sample, spStage, total)#omit very rare species
 #cast dataframe to site by species format
 p.site.sp <- dcast(p, date+location+depth~spStage, value.var="total", fun.aggregate = mean)
 p.site.sp[is.na(p.site.sp)] <- 0
@@ -23,7 +23,10 @@ p.comm <- p.site.sp[,4:ncol(p.site.sp)]
 p.env <- p.site.sp[,1:3]
 p.dist <- vegdist(p.comm)
 attach(p.env)
+#====
 
+#COMMUNITY ANALYSIS OF SIMILARITY
+#====
 #Similarity across date
 p.ano.st <- anosim(p.dist, date)
 summary(p.ano.st) %>% saveRDS(file = "output/anosim_date.rda")
@@ -60,8 +63,10 @@ names(cent2) [-1] <- colnames(scrs)
 
 #Species Scores
 sppscores(p.NMDS) <- p.comm
-saveRDS(summary(p.NMDS$species), file = "output/nmds_spp_scores_summary.rda")
-saveRDS(p.NMDS$species, file = "output/nmds_spp_scores.rda")
+sppSum <- as.data.frame(summary(p.NMDS$species))
+sppScores <- as.data.frame(p.NMDS$species)
+sppScores$type <- rownames(sppScores)
+write_csv(sppScores, file = "output/sppScores.csv")
 #====
 
 #Go to 8_analysis_commonTaxa
