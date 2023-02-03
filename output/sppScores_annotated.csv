@@ -1,0 +1,65 @@
+MDS1,MDS2,type,group
+1.327796802,0.512876886,amphipod_adult,Generalist
+2.989989877,0.734213973,ascidian_larva,Coastal Meroplankton
+-0.764081348,-0.221032889,balanus.crenatus_cyprid,Coastal Meroplankton
+-0.243204054,-0.647923725,balanus.crenatus_nauplius2.3,Coastal Meroplankton
+-0.590330535,-0.312743375,balanus.crenatus_nauplius4.5,Coastal Meroplankton
+0.505448623,-0.661947473,balanus.glandula_cyprid,Coastal Meroplankton
+2.100004293,-0.501899927,balanus.glandula_nauplius2.3,Coastal Meroplankton
+1.85139625,-0.11960836,balanus.nubilus_cyprid,Coastal Meroplankton
+3.065780392,-1.021634971,bivalve_umbo,Coastal Meroplankton
+1.202180206,-1.113313755,bivalve_veliger,Coastal Meroplankton
+5.354528075,1.112103409,brachiopod_larva,Coastal Meroplankton
+0.897518281,0.517372368,bryozoan_larva,Coastal Meroplankton
+-0.432227487,0.401820955,calanoid_adult,Pelagic Holoplankton
+2.131349831,-0.661220116,cancer.gracilis_zoea1.2,Coastal Meroplankton
+-1.348841264,0.093618568,chaetognath_adult,Pelagic Holoplankton
+2.32166968,-0.510315923,chthamalus.spp_cyprid,Coastal Meroplankton
+1.596747563,0.205053272,chthamalus.spp_nauplius2.3,Coastal Meroplankton
+-0.276447543,0.165146035,chthamalus.spp_nauplius4.5,Coastal Meroplankton
+0.268564625,0.574816861,copepod_metanauplius,Pelagic Holoplankton
+1.549258405,0.116043009,copepod_nauplius,Pelagic Holoplankton
+1.146829672,-0.411057976,ctenophore_medusa,Pelagic Holoplankton
+-0.603287306,-0.560904172,cyclopoid_adult,Pelagic Holoplankton
+-1.302010353,-0.220584363,diatom_adult,Non-Swimming
+-0.420546457,-0.150885977,egg.large_embryo,Non-Swimming
+0.521195796,-0.542705007,egg.mass_embryo,Non-Swimming
+1.366620709,0.647609327,egg.small_embryo,Non-Swimming
+1.43888984,-0.429402868,emerita.analoga_zoea1,Coastal Meroplankton
+0.689706127,0.017429012,euphausiid_furcilia,Pelagic Holoplankton
+1.02598289,1.186120329,euphausiid_protozoea,Pelagic Holoplankton
+-1.780895153,-0.341367158,evadne_adult,Pelagic Holoplankton
+0.119667388,1.361283138,fish_larva,Coastal Meroplankton
+2.491023627,-0.446580775,foraminiferan_adult,Non-Swimming
+-1.0603053,-0.575371476,foraminiferan_larva,Non-Swimming
+1.68975167,-0.4709627,gastropod_juvenile,Coastal Meroplankton
+1.851914813,-0.441454474,gastropod_trochophore,Coastal Meroplankton
+0.643802967,-0.474764434,gastropod_veliger,Coastal Meroplankton
+0.100108915,-0.166681881,harpacticoid_adult,Pelagic Holoplankton
+1.25260547,-1.119625755,hemigrapsus.spp_zoea1.3,Coastal Meroplankton
+-0.845107784,1.024626931,hippolytidae_zoea,Coastal Meroplankton
+1.378192467,1.396413054,hydroid_adult,Non-Swimming
+-0.137494183,0.388921619,isopod_adult,Generalist
+-1.849675417,0.027518823,lithodidae_zoea1.3,Coastal Meroplankton
+0.710595838,-0.640556679,medusazoa_medusa,Pelagic Holoplankton
+2.623983749,-0.999815408,mite_adult,Generalist
+2.197899796,0.761787028,mytilus.spp_umbo,Coastal Meroplankton
+-0.032470183,0.369895958,neotrypaea_zoea1.3,Coastal Meroplankton
+-0.117579669,-0.403495545,oikopleura_larva,Pelagic Holoplankton
+2.332531589,-0.641586501,ophiuroidea_ophiopluteus,Coastal Meroplankton
+2.269598665,-0.376461018,pachygrapsis.crassipes_zoea1.3,Coastal Meroplankton
+-0.610135228,-0.561527937,pagurus.spp_zoea1.3,Coastal Meroplankton
+-0.002751684,-0.709691615,pandalus.spp_zoea1.3,Coastal Meroplankton
+-0.91568207,-0.180397348,phoronid_larva,Coastal Meroplankton
+0.846793405,-0.611879669,pinnotherid_zoea1.3,Coastal Meroplankton
+-1.046363051,-0.454209745,podon_adult,Pelagic Holoplankton
+2.773412291,-0.414060092,pollicipes.polymerus_cyprid,Coastal Meroplankton
+1.221888631,-0.443159773,polychaete_metatrochophore,Coastal Meroplankton
+0.486966481,-0.048994794,polychaete_setiger,Coastal Meroplankton
+1.161238581,-0.373056377,polychaete_trochophore,Coastal Meroplankton
+0.946410234,-0.280985802,porcellanid_zoea1.3,Coastal Meroplankton
+2.496903646,1.569002668,pteropod_veliger,Pelagic Holoplankton
+1.112393435,0.123366561,radiolarian_adult,Non-Swimming
+1.46181076,-0.125273458,strongylocentrotus.spp_echinopluteus,Coastal Meroplankton
+2.197831186,-0.071436816,tintinnid_adult,Pelagic Holoplankton
+0.578259409,-0.238260185,upogebia_zoea1.3,Coastal Meroplankton
