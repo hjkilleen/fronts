@@ -64,7 +64,7 @@ hfrPlot <- ggplot(x) +
   geom_line(aes(x = datetime_pdt, y = speed, color = id), linewidth = 0.5) + 
   scale_x_break(dateBreaks, space = 1) + 
   scale_x_continuous(labels = x.labs, breaks = x.breaks) + 
-  scale_color_grey() + 
+  scale_color_manual(values = c("grey", "black")) + 
   labs(x = "", y = "Current speed (cm/s)") +
   theme_classic() +
   theme(text = element_text(size = 20), axis.text = element_text(size = 10)) +
