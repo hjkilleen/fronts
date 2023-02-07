@@ -1,0 +1,35 @@
+NOAA/NOS/CO-OPS
+Disclaimer: These data are based upon the latest information available as of the date of your request, and may differ from the published tide tables.
+Daily Tide Predictions
+StationName: Bodega Harbor entrance 
+State:  
+Stationid: 9415625
+ReferencedToStationName: San Francisco
+ReferencedToStationId: 9414290
+HeightOffsetLow: + 0.1
+HeightOffsetHigh: + -0.2
+TimeOffsetLow: -16
+TimeOffsetHigh: -38
+Prediction Type: Subordinate
+From: 20190813 04:50 - 20190816 18:32
+Units: Feet
+Time Zone: LST_LDT
+Datum: MLLW
+Interval Type: High/Low
+
+Date 		Day	Time	Pred	High/Low
+2019/08/13	Tue	04:50	-0.22	L
+2019/08/13	Tue	11:36	4.94	H
+2019/08/13	Tue	16:39	2.85	L
+2019/08/13	Tue	22:16	6.13	H
+2019/08/14	Wed	05:26	-0.21	L
+2019/08/14	Wed	12:10	4.96	H
+2019/08/14	Wed	17:19	2.74	L
+2019/08/14	Wed	22:55	6.04	H
+2019/08/15	Thu	05:59	-0.14	L
+2019/08/15	Thu	12:41	4.95	H
+2019/08/15	Thu	17:56	2.62	L
+2019/08/15	Thu	23:33	5.88	H
+2019/08/16	Fri	06:31	-0.01	L
+2019/08/16	Fri	13:09	4.95	H
+2019/08/16	Fri	18:32	2.50	L

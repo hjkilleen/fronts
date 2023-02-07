@@ -75,7 +75,7 @@ offwind <- shift.wind(offwind, coastline.angle = 320, dir = "wd", spe = "ws", ti
 #calculate alongshore wind stress; drag coeff=.0014, air density=1.3
 offwind$asws <- abs(offwind$aspe)*(offwind$aspe)*(.0014)*(1.3)
 #filter to only sampling period
-offwind <- filter(offwind, date>as.POSIXct("2019-07-01"), date<as.POSIXct("2020-10-31"))
+offwind <- filter(offwind, date>as.POSIXct("2019-05-01"), date<as.POSIXct("2020-10-31"))
 #save .rda file
 save(offwind, file = "data/environment/46013wind/offwind.rda")
 #====
