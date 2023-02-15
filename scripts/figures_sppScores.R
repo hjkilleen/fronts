@@ -36,6 +36,6 @@ ggsave("figures/sppScores.jpg", width = 6, height = 3, units = "in", dpi = 300)
 
 #GROUP COMPARISONS
 #====
-car::Anova(lm(MDS1~group, sppScores))
+summary(aov(MDS1~group, sppScores))
 emmeans::emmeans(lm(MDS1~group, sppScores), pairwise~group)
 #====

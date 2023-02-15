@@ -61,6 +61,11 @@ cent2 <-#for location
   aggregate(scrs ~ location, data = p.comm, FUN = "mean")
 names(cent2) [-1] <- colnames(scrs)
 
+#Site Scores
+siteScores <- cbind(scrs, p.env)
+site.aov <- aov(NMDS1~location, siteScores)
+emmeans(site.aov, pairwise~location, at = list(location = c("onshore", "front", "offshore")))#get pairwise comparisons, onshore vs. offshore significantly different < 0.05, front vs. offshore marinally different <0.12.6420.0
+
 #Species Scores
 sppscores(p.NMDS) <- p.comm
 sppSum <- as.data.frame(summary(p.NMDS$species))
