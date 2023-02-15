@@ -1,0 +1,333 @@
+---
+title: "Common Taxa Model Selection"
+author: "Helen Killeen"
+date: "`r Sys.Date()`"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+```{r load}
+library(glmmTMB)
+library(reshape2)
+library(tidyverse)
+library(car)
+library(emmeans)
+
+load("../data/biology/counts/plankton.rda")
+
+us <- filter(plankton, n>20)#create a dataframe of "usual suspects" with only the most commonly observed species (50% of all samples collected)
+tows <- dplyr::select(us, sample, date, site, location, depth) %>% distinct()#get essential metadata
+
+y.us <- dcast(us, sample~spStage, value.var = "sampleCount", fun.aggregate = mean)#create wide df
+y.us[is.na(y.us)] <- 0
+y.us <- left_join(y.us, distinct(dplyr::select(us, sample, location, depth, date, volume_total)))
+```
+
+## Model structure
+
+For each of the 17 plankton types below, all of which were present in >50% of samples collected, we tested four related models. All four models employed a hurdle structure (zero and non-zero outcomes modeled separately) and had a fixed effect for location and depth:location, but varied in error and random effect structure. 
+
+**Model 0**: Truncated poisson distribution
+
+**Model 1**: Truncated negative binomial family 1
+
+**Model 2**: Truncated negative binomial family 2
+
+**Model 3**: Best performing error structure with added random effect for survey date
+
+## Model selection
+
+We used the Aikaike Information Criterion (AIC) to select the highest performing model (model estimates are reported in the main text). In each of the sections below we show histograms of plankton concentration to demonstrate the degree of zero-inflation and over-dispersion in each group, and we present AIC tables comparing the four model types. NAs indicate failed model convergence.
+
+### *Balanus crenatus* cyprids
+```{r}
+x <- select(y.us, date, location, depth, balanus.crenatus_cyprid, volume_total)
+
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(balanus.crenatus_cyprid))
+
+#Hurdle models for testing
+m0 <- glmmTMB(balanus.crenatus_cyprid~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
+
+AIC(m0, m1, m2, m3)#select model with lowest AIC value, m3
+```
+
+
+### *Balanus crenatus* nauplius
+```{r}
+x <- dplyr::select(y.us, date, location, depth, balanus.crenatus_nauplius4.5, volume_total)
+
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(balanus.crenatus_nauplius4.5))
+
+#Hurdle models for testing
+m0 <- glmmTMB(balanus.crenatus_nauplius4.5~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
+
+AIC(m0, m1, m2, m3)#select model with lowest AIC value, m3
+```
+
+### Bivalve umbo
+```{r}
+x <- dplyr::select(y.us, date, location, depth, bivalve_umbo, volume_total)
+
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(bivalve_umbo))
+
+#Hurdle models for testing
+m0 <- glmmTMB(bivalve_umbo~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
+
+AIC(m0, m1, m2, m3)#select model with lowest AIC value, m2
+```
+
+
+### *Chthamalus* spp. cyprid
+```{r}
+x <- dplyr::select(y.us, date, location, depth, chthamalus.spp_cyprid, volume_total)
+
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(chthamalus.spp_cyprid))
+
+#Hurdle models for testing
+m0 <- glmmTMB(chthamalus.spp_cyprid~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
+
+AIC(m0, m1, m2, m3)#select model with lowest AIC value, m3
+```
+
+
+### Gastropod veliger
+```{r}
+x <- dplyr::select(y.us, date, location, depth, gastropod_veliger, volume_total)
+
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(gastropod_veliger))
+
+#Hurdle models for testing
+m0 <- glmmTMB(gastropod_veliger~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
+
+AIC(m0, m1, m2, m3)#select model with lowest AIC value, m3
+```
+
+
+### Pinnotherid zoea
+```{r}
+x <- dplyr::select(y.us, date, location, depth, pinnotherid_zoea1.3, volume_total)
+
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(pinnotherid_zoea1.3))
+
+#Hurdle models for testing
+m0 <- glmmTMB(pinnotherid_zoea1.3~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
+
+AIC(m0, m1, m2, m3)#select model with lowest AIC value, m3
+```
+
+
+### Polychaete setiger
+```{r}
+x <- dplyr::select(y.us, date, location, depth, polychaete_setiger, volume_total)
+
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(polychaete_setiger))
+
+#Hurdle models for testing
+m0 <- glmmTMB(as.integer(polychaete_setiger)~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
+
+AIC(m0, m1, m2, m3)#select model with lowest AIC value, m3
+```
+
+
+### Calanoid adult
+```{r}
+x <- dplyr::select(y.us, date, location, depth, calanoid_adult, volume_total)
+
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(calanoid_adult))
+
+#Hurdle models for testing
+m0 <- glmmTMB(calanoid_adult~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
+
+AIC(m0, m1, m2, m3)#select model with lowest AIC value, m3
+```
+
+
+### Copepod metanauplius
+```{r}
+x <- dplyr::select(y.us, date, location, depth, copepod_metanauplius, volume_total)
+
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(copepod_metanauplius))
+
+#Hurdle models for testing
+m0 <- glmmTMB(copepod_metanauplius~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
+
+AIC(m0, m1, m2, m3)#select model with lowest AIC value, m2
+```
+
+
+### Copepod nauplius
+```{r}
+x <- dplyr::select(y.us, date, location, depth, copepod_nauplius, volume_total)
+
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(copepod_nauplius))
+
+#Hurdle models for testing
+m0 <- glmmTMB(copepod_nauplius~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
+
+AIC(m0, m1, m2, m3)#select model with lowest AIC value, m2
+```
+
+
+### Cyclopoid adult
+```{r}
+x <- dplyr::select(y.us, date, location, depth, cyclopoid_adult, volume_total)
+
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(cyclopoid_adult))
+
+#Hurdle models for testing
+m0 <- glmmTMB(cyclopoid_adult~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
+
+AIC(m0, m1, m2, m3)#select model with lowest AIC value, m3
+```
+
+
+### Evadne
+```{r}
+x <- dplyr::select(y.us, date, location, depth, evadne_adult, volume_total)
+
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(evadne_adult))
+
+#Hurdle models for testing
+m0 <- glmmTMB(evadne_adult~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
+
+AIC(m0, m1, m2, m3)#select model with lowest AIC value, m3
+```
+
+
+### Larvacea
+```{r}
+x <- dplyr::select(y.us, date, location, depth, oikopleura_larva, volume_total)
+
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(oikopleura_larva))
+
+#Hurdle models for testing
+m0 <- glmmTMB(oikopleura_larva~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
+
+AIC(m0, m1, m2, m3)#select model with lowest AIC value, m3
+```
+
+
+### Podon
+```{r}
+x <- dplyr::select(y.us, date, location, depth, podon_adult, volume_total)
+
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(podon_adult))
+
+#Hurdle models for testing
+m0 <- glmmTMB(podon_adult~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
+
+AIC(m0, m1, m2, m3)#select model with lowest AIC value, m3
+```
+
+
+### Diatom
+```{r}
+x <- dplyr::select(y.us, date, location, depth, diatom_adult, volume_total)
+
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(diatom_adult))
+
+#Hurdle models for testing
+m0 <- glmmTMB(diatom_adult~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
+
+AIC(m0, m1, m2, m3)#select model with lowest AIC value, m3
+```
+
+
+### Large eggs
+```{r}
+x <- dplyr::select(y.us, date, location, depth, egg.large_embryo, volume_total)
+
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(egg.large_embryo))
+
+#Hurdle models for testing
+m0 <- glmmTMB(egg.large_embryo~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
+
+AIC(m0, m1, m2, m3)#select model with lowest AIC value, m3
+```
+
+
+### Small eggs
+```{r}
+x <- dplyr::select(y.us, date, location, depth, egg.small_embryo, volume_total)
+
+ggplot(x) + #visual overdispersion test
+  geom_histogram(aes(egg.small_embryo))
+
+#Hurdle models for testing
+m0 <- glmmTMB(egg.small_embryo~location+depth:location+offset(log(volume_total)), data = y.us, ziformula = ~1, family = truncated_poisson)#fit with poisson family distribution
+m1 <- update(m0, family = truncated_nbinom1)#negative binomial family 1
+m2 <- update(m1, family = truncated_nbinom2)#negative binomial family 2
+m3 <- update(m2, ~. + (1|date))#with random variable for date
+
+AIC(m0, m1, m2, m3)#select model with lowest AIC value, m2
+```
+
