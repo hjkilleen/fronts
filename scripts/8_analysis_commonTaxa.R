@@ -162,6 +162,7 @@ summary(m3)#Simple effects and model diagnostics
 Anova(m3)#main effects
 
 mefx[5,] <- c("Gastropod veliger", 2.386, 0.303, 14.146, 0.003)#location estimate, p value, location:depth estimate, p value
+emmeans(m3, pairwise~depth)#get pairwise comparisons
 
 
 
@@ -210,6 +211,8 @@ summary(m3)#Simple effects and model diagnostics
 Anova(m3)#main effects
 
 mefx[7,] <- c("Polychaete larva", 2.487, 0.288, 18.412, 0.0004)#location estimate, p value, location:depth estimate, p value
+emmeans(m3, pairwise~location:depth)#get pairwise comparisons
+
 
 
 
@@ -457,12 +460,14 @@ summary(m2)#Simple effects and model diagnostics
 Anova(m2)#main effects
 
 mefx[17,] <- c("Small egg", 10.445, 0.005, 0.381, 0.944)#location estimate, p value, location:depth estimate, p value
+
+emmeans(m2, pairwise~location, at = list(location = c("onshore", "front", "offshore")))#get pairwise comparisons
 #====
 
 #SAVE TABLES
 #====
-write_csv(mefx, file = "output/mainEfx.csv")
-write_csv(pairs, file = "output/pairwise.csv")
+#write_csv(mefx, file = "output/mainEfx.csv")
+#write_csv(pairs, file = "output/pairwise.csv")
 #====
 
 #END ANALYSIS, GO TO FIGURE FILES
