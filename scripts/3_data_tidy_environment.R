@@ -52,12 +52,13 @@ ws <- rbind(ws19, ws20)
 save(wd, file = "data/environment/BOONwind/wd.rda")
 save(ws, file = "data/environment/BOONwind/ws.rda")
 
-#NDBC 46013 winds
+#NDBC 46013 waves and winds
 #tidy tables and bind into single file
 windNames <- c("year", "month", "day", "hour", "min", "wd", "ws", "GST", "WVHT", "DPD", "APD", "MWD", "PRES", "ATMP", "WTMP", "DEWP", "VIS", "TIDE")
 names(offwind2019) <- windNames
 names(offwind2020) <- windNames
 offwind <- rbind(offwind2019, offwind2020)
+
 #remove error readings
 offwind <- filter(offwind, wd<361)
 #create datetime variable in GMT
@@ -66,6 +67,11 @@ offwind$datetimeGMT <- as_datetime(paste(offwind$year, offwind$month, offwind$da
 offwind$datetimePDT <- with_tz(offwind$datetimeGMT, tzone = "America/Los_Angeles")
 #local date for openair pkg
 offwind$date <- offwind$datetimePDT
+#save .rda file for wave analysis
+offwaves <- offwind
+#Calculate average daily wave height 
+offwaves <- timeAverage(filter(offwaves, WVHT<50), ave.time = "day", na.action = na.omit)
+save(offwaves, file = "data/environment/46013wind/waves.rda")
 #Calculate average daily wind speeds and direction with scalar wind speeds
 offwind <- timeAverage(offwind, avg.time = "day", na.action = na.omit)
 #convert knots to m/s
@@ -76,7 +82,7 @@ offwind <- shift.wind(offwind, coastline.angle = 320, dir = "wd", spe = "ws", ti
 offwind$asws <- abs(offwind$aspe)*(offwind$aspe)*(.0014)*(1.3)
 #filter to only sampling period
 offwind <- filter(offwind, date>as.POSIXct("2019-05-01"), date<as.POSIXct("2020-10-31"))
-#save .rda file
+#save .rda file for wind analysis 
 save(offwind, file = "data/environment/46013wind/offwind.rda")
 #====
 

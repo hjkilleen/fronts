@@ -31,6 +31,28 @@ text(-123, 38.7, "Stewarts Point")
 text(-122.75, 38.3, expression("Bodega\nHead"))
 
 
+#make base map
+bhsp <- getNOAA.bathy(lon1 = -122.059046, lon2 = -123.880030,
+                      lat1 = 37.436805, lat2 = 38.686682)
+
+bhsp.f <- fortify(bhsp)
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+#tiff("map.tiff", units="in", width=20, height=10, res=300)
+
+ggplot(bhsp.f, aes(x = x, y = y)) + 
+  coord_quickmap() + 
+  geom_raster(aes(fill = z), data = bhsp.f[bhsp.f$z<=0,]) + 
+  geom_contour(aes(z = z), color = "white", linewidth = 0.1) +
+  #geom_sf(data = world, inherit.aes = FALSE) +
+  geom_point(data = distinct(dplyr::select(dat, site, lat, lon)), aes(lon, lat), fill = "red", color = "black", shape = 21, size = 6, alpha = .5) +
+  geom_point(data = distinct(dplyr::select(old_dat, site, latitude, longitude)), aes(longitude, latitude), fill = "orange", color = "black", fill = "white", shape = 21, size = 6, alpha = .5) +
+  theme_void() +
+  guides(fill = FALSE) +
+  scale_x_continuous(expand = c(0,0)) + 
+  scale_y_continuous(expand = c(0,0))
+
+#dev.off()
 
 
 #GGMAP

@@ -31,10 +31,11 @@ for(i in 1:length(ctdDates)){#Interpolate and create plots for each cruise
     # ylim(0,100) + 
     # xlim(0, 35) +
     labs(x = "", y = "Depth (m)") + 
-    scale_y_reverse() + 
+    scale_y_reverse() +
+    scale_x_reverse() + 
     scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = mean(na.omit(df$Temp)), na.value = "transparent", name = "Temp °C") + 
     theme_classic() +
-    theme(text = element_text(size = 20), axis.text = element_text(size = 10))
+    theme(text = element_text(size = 20), axis.text = element_text(size = 12))
   print(p)
   ggsave(paste(results, gsub("/",".",ctdDates[i]), ".jpg", sep = ""))
   temp_list[[i]] = p
@@ -67,6 +68,7 @@ for(i in 1:length(ctdDates)){#Interpolate and create plots for each cruise
     # xlim(0, 35) +
     labs(x = "Distance from onshore cast (m)", y = "Depth (m)") + 
     scale_y_reverse() + 
+    scale_x_reverse() + 
     scale_fill_gradientn(colors = viridis_pal()(20), na.value = "transparent", name = "Salinity (psu)") + 
     theme_light()
   print(p)

@@ -24,7 +24,7 @@ cruise3.hfr <- ggplot(filter(boonHFR, datetime_pdt > as.POSIXct(as.numeric(cruis
   scale_color_manual(values = c("grey", "black")) + 
   labs(x = "", y = paste(print(cruiseDates[2]), "Speed (cm/s)", sep = "\n")) +
   theme_classic() +
-  theme(text = element_text(size = 20), axis.text = element_text(size = 10), legend.position = "none")
+  theme(text = element_text(size = 20), axis.text = element_text(size = 12), legend.position = "none", plot.margin = margin(5, 30, 5, 5))
 ggsave("figures/surveyEnvironment/cruise3.hfr.jpg", dpi = 300)
 
 #Sept. 20, 2019
@@ -36,7 +36,7 @@ cruise4.hfr <- ggplot(filter(boonHFR, datetime_pdt > as.POSIXct(as.numeric(cruis
   scale_color_manual(values = c("grey", "black")) + 
   labs(x = "", y = paste(print(cruiseDates[3]), "Speed (cm/s)", sep = "\n")) +
   theme_classic() +
-  theme(text = element_text(size = 20), axis.text = element_text(size = 10), legend.position = "none")
+  theme(text = element_text(size = 20), axis.text = element_text(size = 12), legend.position = "none", plot.margin = margin(5, 30, 5, 5))
 ggsave("figures/surveyEnvironment/cruise4.hfr.jpg", plot = cruise4.hfr, dpi = 300)
 
 #June 23, 2020
@@ -48,7 +48,7 @@ cruise5.hfr <- ggplot(filter(boonHFR, datetime_pdt > as.POSIXct(as.numeric(cruis
   scale_color_manual(values = c("grey", "black")) + 
   labs(x = "", y = paste(print(cruiseDates[4]), "Speed (cm/s)", sep = "\n")) +
   theme_classic() +
-  theme(text = element_text(size = 20), axis.text = element_text(size = 10), legend.position = "none")
+  theme(text = element_text(size = 20), axis.text = element_text(size = 12), legend.position = "none", plot.margin = margin(5, 30, 5, 5))
 ggsave("figures/surveyEnvironment/cruise5.jpg", plot = cruise5.hfr, dpi = 300)
 
 #June 30, 2020
@@ -60,7 +60,7 @@ cruise6.hfr <- ggplot(filter(boonHFR, datetime_pdt > as.POSIXct(as.numeric(cruis
   scale_color_manual(values = c("grey", "black")) + 
   labs(x = "", y = paste(print(cruiseDates[5]), "Speed (cm/s)", sep = "\n")) +
   theme_classic() +
-  theme(text = element_text(size = 20), axis.text = element_text(size = 10), legend.position = "none")
+  theme(text = element_text(size = 20), axis.text = element_text(size = 12), legend.position = "none", plot.margin = margin(5, 30, 5, 5))
 ggsave("figures/surveyEnvironment/cruise6.jpg", plot = cruise6.hfr, dpi = 300)
 
 #Aug. 30, 2020
@@ -72,7 +72,7 @@ cruise9.hfr <- ggplot(filter(boonHFR, datetime_pdt > as.POSIXct(as.numeric(cruis
   scale_color_manual(values = c("grey", "black")) + 
   labs(x = "", y = paste(print(cruiseDates[6]), "Speed (cm/s)", sep = "\n")) +
   theme_classic() +
-  theme(text = element_text(size = 20), axis.text = element_text(size = 10), legend.position = "none")
+  theme(text = element_text(size = 20), axis.text = element_text(size = 12), legend.position = "none", plot.margin = margin(5, 30, 5, 5))
 ggsave("figures/surveyEnvironment/cruise9.jpg", plot = cruise9.hfr, dpi = 300)
 
 #Oct. 6, 2020
@@ -84,7 +84,7 @@ cruise10.hfr <- ggplot(filter(boonHFR, datetime_pdt > as.POSIXct(as.numeric(crui
   scale_color_manual(values = c("grey", "black")) + 
   labs(x = "Local Time (PDT)", y = paste(print(cruiseDates[7]), "Speed (cm/s)", sep = "\n")) +
   theme_classic() +
-  theme(text = element_text(size = 20), axis.text = element_text(size = 10), legend.position = "none")
+  theme(text = element_text(size = 20), axis.text = element_text(size = 12), legend.position = "none", plot.margin = margin(5, 30, 5, 5))
 ggsave("figures/surveyEnvironment/cruise10.jpg", plot = cruise10.hfr, dpi = 300)
 #====
 
@@ -99,7 +99,7 @@ for(i in 3:7){
     scale_y_continuous(name = "Speed (mph, blue)", 
                        sec.axis = sec_axis(~.*8, name = "Direction (red)")) +
     theme_classic() +
-    theme(text = element_text(size = 20), axis.text = element_text(size = 10), legend.position = "none")
+    theme(text = element_text(size = 20), axis.text = element_text(size = 12), legend.position = "none", plot.margin = margin(5, 30, 5, 5))
   print(p)
   ggsave(paste("figures/supplement/surveyWind/", gsub("-",".",cruiseDates[i]), ".pdf", sep = ""))
 }

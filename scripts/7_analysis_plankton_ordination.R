@@ -6,6 +6,7 @@
 #====
 library(reshape2)
 library(vegan)
+library(tidyverse)
 
 load("data/biology/counts/plankton.rda")
 #====
@@ -49,7 +50,7 @@ plot(p.ano.st)
 levels(p.env$location) <- c("front", "onshore", "offshore")
 p.env$date <- as.factor(p.env$date)
 
-p.NMDS <- metaMDS(p.dist, k=2)#run NMDS
+p.NMDS <- metaMDS(p.dist, k=2)#run NMDS, stress = 0.0790258
 
 scrs <-#calculate centroids
   scores(p.NMDS, display = "sites", "species")

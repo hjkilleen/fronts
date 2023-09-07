@@ -38,11 +38,6 @@ offwind2019 <- read.table("data/environment/46013wind/46013h2019.txt")
 offwind2020 <- read.table("data/environment/46013wind/46013h2020.txt")
 #====
 
-#LOAD CUTI DATA
-#====
-cuti <- read_csv("data/environment/CUTI/cuti.csv")
-#====
-
 #LOAD BOON TEMPERATURE DATA
 #====
 boonTemp <- read_csv("data/environment/BOONtemp/boonTemp.csv")

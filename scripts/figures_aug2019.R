@@ -32,11 +32,11 @@ tide$datetime <- as.POSIXct(paste(tide$Date, tide$Time, sep = " "), format = "%m
 #WIND
 wind <- ggplot() + 
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", linewidth = .3) + 
-  geom_line(data = offwind, aes(x = as.numeric(datetimePDT), y= asws), color = "grey", linewidth = .5) +
+  geom_line(data = offwind, aes(x = as.numeric(datetimePDT), y= asws), color = "black", linewidth = .5) +
   scale_x_continuous(labels = x.labs, breaks = x.breaks) + 
   labs(x = "", y = "Alongshore\nwind stress (Pa)") + 
   theme_classic() +
-  theme(text = element_text(size = 20), axis.text = element_text(size = 10))
+  theme(text = element_text(size = 20), axis.text = element_text(size = 11))
 
 #CURRENTS
 current <- ggplot(filter(boonHFR, datetime_pdt > as.POSIXct("2019-08-13"), datetime_pdt < as.POSIXct("2019-08-17"), id %in% c("b7u", "b7v"))) + 
@@ -44,23 +44,27 @@ current <- ggplot(filter(boonHFR, datetime_pdt > as.POSIXct("2019-08-13"), datet
   ylim(-30, 25) +
   geom_line(aes(x = datetime_pdt, y = speed, color = id)) +
   scale_x_continuous(labels = x.labs, breaks = x.breaks) + 
-  labs(x = "", y = "Speed cm/s") + 
+  labs(x = "", y = "Current\nSpeed cm/s") + 
   scale_color_manual(values = c("grey", "black")) + 
   theme_classic() +
-  theme(text = element_text(size = 20), axis.text = element_text(size = 10), legend.position = "none")
+  theme(text = element_text(size = 20), axis.text = element_text(size = 11), legend.position = "none")
 
 #TIDES
-tide <- ggplot(tide) + 
+tidep <- ggplot(tide) + 
   geom_hline(yintercept = 0, color = "black", linetype = "dashed") +
   ggalt::geom_xspline(aes(x = datetime, y = Pred)) +#make lines curved to resemble tide chart
   scale_x_continuous(labels = x.labs, breaks = x.breaks) + 
-  labs(x = "Datetime", y = "NOAA tide prediction (ft)") + 
+  labs(x = "Datetime", y = "NOAA tide\nprediction (ft)") + 
   theme_classic() +
-  theme(text = element_text(size = 20), axis.text = element_text(size = 10), legend.position = "none")
+  theme(text = element_text(size = 20), axis.text = element_text(size = 11), legend.position = "none")
+
+#Blank
+blank <- ggplot() + 
+  theme_void()
 #=====
 
 #ARRANGE SUBPLOTS & SAVE
 #====
-p <- plot_grid(print(wind), print(current), print(tide), ncol = 1, align = "v")
+p <- plot_grid(print(blank), print(wind), print(current), print(tidep), ncol = 1, align = "v")
 ggsave2(p, file = "figures/aug2019.jpg", width = 8, height = 9, units = "in", dpi = 300)
 #====

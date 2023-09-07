@@ -17,17 +17,18 @@ NA,2019-08-15T07:00:00Z,ctd_underway,TRUE,TRUE,NA,NA,NA,NA,10:45:00,11:05:00,NA,
 1,2019-08-15T07:00:00Z,su,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 2,2019-08-15T07:00:00Z,su,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 3,2019-08-15T07:00:00Z,su,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-1,2019-09-20T07:00:00Z,ctd_profile,TRUE,TRUE,38.32629,-123.08548,NA,NA,11:22:00,NA,NA,NA,NA,"estimated locations based on tows, actually locations were not recorded in the field due to equipment failure",NA,NA
-2,2019-09-20T07:00:00Z,ctd_profile,TRUE,TRUE,38.32629,-123.07822,NA,NA,10:27:00,NA,NA,NA,NA,"estimated locations based on tows, actually locations were not recorded in the field due to equipment failure",NA,NA
-3,2019-09-20T07:00:00Z,ctd_profile,TRUE,TRUE,NA,NA,NA,NA,10:48:00,NA,NA,NA,NA,"estimated locations based on tows, actually locations were not recorded in the field due to equipment failure",NA,NA
-4,2019-09-20T07:00:00Z,ctd_profile,TRUE,TRUE,38.32087,-123.08688,NA,NA,11:08:00,NA,NA,NA,NA,"estimated locations based on tows, actually locations were not recorded in the field due to equipment failure",NA,NA
-5,2019-09-20T07:00:00Z,ctd_profile,TRUE,TRUE,38.32083,-123.08685,NA,NA,11:38:00,NA,NA,NA,NA,"estimated locations based on tows, actually locations were not recorded in the field due to equipment failure",NA,NA
-431,2019-09-20T07:00:00Z,mt,TRUE,TRUE,NA,NA,NA,NA,11:28:00,11:33:00,798802,808327,NA,get lat lon from adcp,offshore,bottom
-432,2019-09-20T07:00:00Z,mt,TRUE,TRUE,NA,NA,38.32087,-123.08688,11:33:00,11:38:00,391534,412072,NA,get lat lon from adcp,offshore,surface
-421,2019-09-20T07:00:00Z,mt,TRUE,TRUE,38.32629,-123.08548,NA,NA,10:15:00,10:20:00,772522,782438,NA,get lat lon from adcp,front,bottom
-422,2019-09-20T07:00:00Z,mt,TRUE,TRUE,NA,NA,NA,NA,10:20:00,10:25:00,390096,394534,NA,get lat lon from adcp,front,surface
-411,2019-09-20T07:00:00Z,mt,TRUE,TRUE,NA,NA,NA,NA,10:50:00,11:00:00,782438,798802,NA,get lat lon from adcp,onshore,bottom
-412,2019-09-20T07:00:00Z,mt,TRUE,TRUE,NA,NA,NA,NA,11:00:00,11:07:00,394534,397777,NA,get lat lon from adcp,onshore,surface
+1,2019-09-20T07:00:00Z,ctd_profile,TRUE,TRUE,38.32087,-123.08688,NA,NA,11:22:00,NA,NA,NA,NA,"estimated locations based on tows, actual locations were not recorded in the field due to equipment failure",NA,NA
+2,2019-09-20T07:00:00Z,ctd_profile,TRUE,TRUE,38.32629,-123.08548,NA,NA,10:27:00,NA,NA,NA,NA,"estimated locations based on tows, actual locations were not recorded in the field due to equipment failure",NA,NA
+3,2019-09-20T07:00:00Z,ctd_profile,TRUE,TRUE,38.32629,-123.07822,NA,NA,10:48:00,NA,NA,NA,NA,"estimated locations based on tows, actual locations were not recorded in the field due to equipment failure",NA,NA
+4,2019-09-20T07:00:00Z,ctd_profile,TRUE,TRUE,38.32471,-123.08411,NA,NA,11:08:00,NA,NA,NA,NA,"estimated locations based on tows, actual locations were not recorded in the field due to equipment failure",NA,NA
+5,2019-09-20T07:00:00Z,ctd_profile,TRUE,TRUE,NA,NA,NA,NA,11:08:00,NA,NA,NA,NA,"estimated locations based on tows, actual locations were not recorded in the field due to equipment failure",NA,NA
+6,2019-09-20T07:00:00Z,ctd_profile,TRUE,TRUE,NA,NA,NA,NA,11:38:00,NA,NA,NA,NA,"estimated locations based on tows, actual locations were not recorded in the field due to equipment failure",NA,NA
+431,2019-09-20T07:00:00Z,mt,TRUE,TRUE,38.32087,-123.0868,38.315,-123.08688,11:28:00,11:33:00,798802,808327,NA,"approximated based on field notes, GPS data loss",offshore,bottom
+432,2019-09-20T07:00:00Z,mt,TRUE,TRUE,38.32087,-123.0868,38.315,-123.08688,11:33:00,11:38:00,391534,412072,NA,"approximated based on field notes, GPS data loss",offshore,surface
+421,2019-09-20T07:00:00Z,mt,TRUE,TRUE,38.323,-123.08525,38.32629,-123.08548,10:15:00,10:20:00,772522,782438,NA,"approximated based on field notes, GPS data loss",front,bottom
+422,2019-09-20T07:00:00Z,mt,TRUE,TRUE,38.323,-123.08525,38.32629,-123.08548,10:20:00,10:25:00,390096,394534,NA,"approximated based on field notes, GPS data loss",front,surface
+411,2019-09-20T07:00:00Z,mt,TRUE,TRUE,38.32629,-123.07822,38.33,-123.08,10:50:00,11:00:00,782438,798802,NA,"approximated based on field notes, GPS data loss",onshore,bottom
+412,2019-09-20T07:00:00Z,mt,TRUE,TRUE,38.32629,-123.07822,38.33,-123.08,11:00:00,11:07:00,394534,397777,NA,"approximated based on field notes, GPS data loss",onshore,surface
 NA,2019-09-20T07:00:00Z,ctd_underway,TRUE,TRUE,NA,NA,NA,NA,9:21:00,11:43:00,NA,NA,NA,NA,NA,NA
 1,2019-09-20T07:00:00Z,su,TRUE,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
 2,2019-09-20T07:00:00Z,su,TRUE,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA

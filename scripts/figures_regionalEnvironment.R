@@ -16,6 +16,7 @@ load("data/environment/hfr/boonHFR.rda")
 cuti <- read_csv("data/environment/CUTI/cuti.csv")
 load("data/environment/BOONtemp/boonTemp.rda")
 load("data/biology/cruiseDates.rda")
+load("data/environment/46013wind/waves.rda")
 #====
 
 #SET UP
@@ -50,8 +51,23 @@ windPlot <- ggplot(boonWind) +
   scale_x_continuous(labels = x.labs, breaks = x.breaks) + 
   labs(x = "", y = "Alongshore\nwind stress (Pa)") + 
   theme_classic() +
-  theme(text = element_text(size = 20), axis.text = element_text(size = 10))
+  theme(text = element_text(size = 20), axis.text = element_text(size = 12))
 ggsave("figures/regionalEnvironment/windPlot.jpg", plot = windPlot, width = 8, height = 3, units = "in", dpi = 300)
+
+#WAVES
+meanW <- mean(offwaves$WVHT)#get climatology
+offwaves <- filter(offwaves, date>as.POSIXct("2019-08-01"), date<as.POSIXct("2020-10-31"))#filter to survey timeframe
+
+wavePlot <- ggplot(offwaves) + 
+  geom_rect(data = highlights, aes(xmin = as.numeric(start), xmax = as.numeric(end), ymin = -Inf, ymax = Inf), alpha = 0.5) +
+  geom_hline(yintercept = meanW, color = "black", linetype = "dashed", linewidth = .3) + 
+  geom_line(aes(x = as.numeric(datetimePDT), y= WVHT), color = "black", linewidth = .5) +
+  scale_x_break(dateBreaks, space = 1) + 
+  scale_x_continuous(labels = x.labs, breaks = x.breaks) + 
+  labs(x = "", y = "Wave height (m)") + 
+  theme_classic() +
+  theme(text = element_text(size = 20), axis.text = element_text(size = 12))
+ggsave("figures/regionalEnvironment/wavePlot.jpg", plot = windPlot, width = 8, height = 3, units = "in", dpi = 300)
 
 #CURRENTS
 boonHFR <- filter(boonHFR, datetime_pdt > as.POSIXct("2019-08-01"), datetime_pdt < as.POSIXct("2020-10-31"), id %in% c("b7u", "b7v"))#filter to survey timeframe
@@ -65,26 +81,11 @@ hfrPlot <- ggplot(x) +
   scale_x_break(dateBreaks, space = 1) + 
   scale_x_continuous(labels = x.labs, breaks = x.breaks) + 
   scale_color_manual(values = c("grey", "black")) + 
-  labs(x = "", y = "Current speed (cm/s)") +
+  labs(x = "", y = "Current\nspeed (cm/s)") +
   theme_classic() +
-  theme(text = element_text(size = 20), axis.text = element_text(size = 10)) +
+  theme(text = element_text(size = 20), axis.text = element_text(size = 12)) +
   theme(legend.position = "none")#cruise 3 
 ggsave("figures/regionalEnvironment/hfrPlot.jpg", plot = hfrPlot, width = 8, height = 3, units = "in", dpi = 300)
-
-#UPWELLING
-cuti$date <- as.POSIXct(paste(cuti$year, cuti$month, cuti$day, sep = "-"))#filter to survey timeframe
-cuti <- filter(cuti, date>as.POSIXct("2019-08-01"), date<as.POSIXct("2020-10-31"))
-
-cutiPlot <- ggplot(cuti) + 
-  geom_rect(data = highlights, aes(xmin = as.numeric(start), xmax = as.numeric(end), ymin = -Inf, ymax = Inf), alpha = 0.5) +
-  geom_hline(yintercept = 0, color = "black", linetype = "dashed", size = .3) + 
-  geom_line(aes(x = as.numeric(date), y = `38N`), linewidth = 0.5) +
-  scale_x_break(dateBreaks, space = 1) + 
-  scale_x_continuous(labels = x.labs, breaks = x.breaks) + 
-  labs(x = "", y = "CUTI") + 
-  theme_classic() +
-  theme(text = element_text(size = 20), axis.text = element_text(size = 10))
-ggsave("figures/regionalEnvironment/cutiPlot.jpg", plot = cutiPlot, width = 8, height = 3, units = "in", dpi = 300)
 
 #TEMPERATURE
 meanT <- mean(boonTemp$temp_C)#get climatology
@@ -98,13 +99,16 @@ tempPlot <- ggplot(boonTemp) +
   scale_x_continuous(labels = x.labs, breaks = x.breaks) + 
   labs(x = "\nDate", y = "SST (°C)") + 
   theme_classic() +
-  theme(text = element_text(size = 20), axis.text = element_text(size = 10))
+  theme(text = element_text(size = 20), axis.text = element_text(size = 12))
 ggsave("figures/regionalEnvironment/tempPlot.jpg", plot = tempPlot, width = 8, height = 3, units = "in", dpi = 300)
+
+blank <- ggplot() + #blank to add space for annotations at top of plot
+  theme_void()
 #====
 
 
 #MERGE PLOTS
 #====
-p <- plot_grid(print(windPlot), print(hfrPlot), print(cutiPlot), print(tempPlot), ncol = 1, align = "v")
+p <- plot_grid(print(blank), print(windPlot), print(wavePlot), print(hfrPlot), print(tempPlot), ncol = 1, align = "v")
 ggsave2(p, file = "figures/regionalEnvironment/regionalEnvironment.jpg", width = 8, height = 12, units = "in", dpi = 300)
 #====
