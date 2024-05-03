@@ -57,7 +57,7 @@ ggplot(bhsp.f, aes(x = x, y = y)) +
 
 #GGMAP
 library(ggmap)
-register_google(key = "AIzaSyA5gYfO8bTgnXZp5e3Hxv994eyQ7vjloaE")
+#register_google(key = )#API Required
 
 #Big Map
 df <- data.frame(lon = -123.079257, lat = 38.323404)
